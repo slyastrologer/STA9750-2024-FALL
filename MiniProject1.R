@@ -146,6 +146,53 @@ sample_n(USAGE, 1000) |>
   mutate(month=as.character(month)) |> 
   DT::datatable()
 
-# Remove the NTD ID and 3 Mode Columns
+#Remove the NTD ID and 3 Mode Columns
 USAGE <- USAGE %>%
   select(-"NTD ID", -"3 Mode") 
+
+
+
+#What transit agency had the most VRM?
+USAGE %>% group_by(Agency) %>%
+  summarize(max(VRM)) %>%
+  arrange(desc(`max(VRM)`))
+#After grouping the data by agency, calculating the max VRM values, and arranging
+#the VRM values in descending order, the transit agency with the most VRM is MTA
+#New York City Transit. 
+
+#What transit mode had the most total VRM in our data set?
+USAGE %>% group_by(Mode) %>%
+  summarize(max(VRM)) %>%
+  arrange(desc(`max(VRM)`))
+#After grouping the data by the mode of transportation, calculating the max VRM values of each mode, 
+#and arranging the VRM values in descending order, the transit mode with the most VRM in the dataset 
+#is Heavy Rail; or more colloquially known as mass rapid transit. 
+
+#How many trips were taken on the NYC Subway (Heavy Rail) in May 2024?
+USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", Mode == "Heavy Rail")
+#To determine how many Heavy Rail trips were taken on the NYC subway in May 2024, the filter function
+#with three parameters is used: the first parameter ensures the data displayed is solely from the MTA NYC Transit,
+#the second parameter ensures that of the MTA NYC Transit data, only datapoints from the month of May are displayed,
+#the third parameter filters out only the transit trips from May that are completed via heavy rail.  
+
+#What mode of transport had the longest average trip in May 2024?
+
+# 
+
+#How much did NYC subway ridership fall between April 2019 and April 2020?
+USAGE %>% filter(Agency == "MTA New York City Transit", Mode == "Heavy Rail")
+
+#Task 4 - Explore and Analyze
+#
+#Task 5 - Table Summarization
+USAGE_2022_ANNUAL <- USAGE %>%
+  filter(year(month) == 2022) %>%
+  group_by("NTD ID", Agency, metro_area, Mode) %>%
+  summarize(UPT = sum(UPT, na.rm = TRUE), VRM = sum(VRM, na.rm = TRUE)) %>%
+  ungroup()
+print(USAGE_2022_ANNUAL)
+
+USAGE_AND_FINANCIALS <- left_join(USAGE_2022_ANNUAL, 
+                                  FINANCIALS, 
+                                  join_by(`NTD ID`, Mode)) |>
+  drop_na() 
