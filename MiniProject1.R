@@ -180,7 +180,11 @@ USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", M
 # 
 
 #How much did NYC subway ridership fall between April 2019 and April 2020?
-USAGE %>% filter(Agency == "MTA New York City Transit", Mode == "Heavy Rail")
+ridership <- c(USAGE |>
+  filter(month >= `2019-04-01`, 
+         month < `2020-05-01`, 
+         Agency == `MTA New York City Transit`, 
+         Mode == `Heavy Rail`))
 
 #Task 4 - Explore and Analyze
 #
