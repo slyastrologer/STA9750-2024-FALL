@@ -183,7 +183,9 @@ USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", M
 USAGE %>%
   filter(Agency == "MTA New York City Transit", Mode == "Heavy Rail") %>%
   filter(month >= "2019-04-01", month < "2020-05-01")
-  summarize(diff(VRM))
+  summarize(avg_A = mean(UPT[group == "2019-04-01"]), 
+            avg_B = mean(UPT[group == "2020-05-01"])) %>%
+    mutate(difference = avg_A - avg_B)
 
 #Task 4 - Explore and Analyze
 #
