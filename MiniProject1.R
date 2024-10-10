@@ -116,7 +116,8 @@ USAGE <- USAGE %>%
   rename(metro_area = "UZA Name")
 
 
-#Task 2 - Recoding the Mode column
+
+#Task 2 - Recoding the Mode Column
 USAGE <- USAGE |>
   mutate(Mode=case_when(
     Mode == "DR" ~ "Demand Response",   
@@ -146,10 +147,12 @@ sample_n(USAGE, 1000) |>
   mutate(month=as.character(month)) |> 
   DT::datatable()
 
+
+
+#Task 3 - Answering Specified Questions With DPLYR
 #Remove the NTD ID and 3 Mode Columns
 USAGE <- USAGE %>%
   select(-"NTD ID", -"3 Mode") 
-
 
 
 #What transit agency had the most VRM?
@@ -160,6 +163,7 @@ USAGE %>% group_by(Agency) %>%
 #the VRM values in descending order, the transit agency with the most VRM is MTA
 #New York City Transit. 
 
+
 #What transit mode had the most total VRM in our data set?
 USAGE %>% group_by(Mode) %>%
   summarize(max(VRM)) %>%
@@ -168,6 +172,7 @@ USAGE %>% group_by(Mode) %>%
 #and arranging the VRM values in descending order, the transit mode with the most VRM in the dataset 
 #is Heavy Rail; or more colloquially known as mass rapid transit. 
 
+
 #How many trips were taken on the NYC Subway (Heavy Rail) in May 2024?
 USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", Mode == "Heavy Rail")
 #To determine how many Heavy Rail trips were taken on the NYC subway in May 2024, the filter function
@@ -175,29 +180,25 @@ USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", M
 #the second parameter ensures that of the MTA NYC Transit data, only datapoints from the month of May are displayed,
 #the third parameter filters out only the transit trips from May that are completed via heavy rail.  
 
-#What mode of transport had the longest average trip in May 2024?
 
-# 
+#What mode of transport had the longest average trip in May 2024?
+#N/A
+
 
 #How much did NYC subway ridership fall between April 2019 and April 2020?
-USAGE %>%
-  filter(Agency == "MTA New York City Transit", Mode == "Heavy Rail") %>%
-  filter(month >= "2019-04-01", month < "2020-05-01")
-  summarize(avg_A = mean(UPT[group == "2019-04-01"]), 
-            avg_B = mean(UPT[group == "2020-05-01"])) %>%
-    mutate(difference = avg_A - avg_B)
+Ridership_April19 <- USAGE %>%
+  filter(month == "2019-04-01", Agency == "MTA New York City Transit", Mode == "Heavy Rail") %>%
+  summarize(Ridership_April19 = sum(UPT, na.rm = TRUE))
+Ridership_April20 <- USAGE %>%
+  filter(month == "2020-04-01", Agency == "MTA New York City Transit", Mode == "Heavy Rail") %>%
+  summarize(Ridership_May24 = sum(UPT, na.rm = TRUE))
+Ridership_Change <- (Ridership_April19 - Ridership_April20)
+Ridership_Change
+#To determine how much subway ridership in NYC fell between April 2019 and April 2020, we first use the
+#filter function to find the requested values and store them in two variables. We then subtract those two variables and
+#store their result in a new variable, which we then run to receive a value of 211,969,660.
+
+
 
 #Task 4 - Explore and Analyze
-#
-#Task 5 - Table Summarization
-USAGE_2022_ANNUAL <- USAGE %>%
-  filter(year(month) == 2022) %>%
-  group_by("NTD ID", Agency, metro_area, Mode) %>%
-  summarize(UPT = sum(UPT, na.rm = TRUE), VRM = sum(VRM, na.rm = TRUE)) %>%
-  ungroup()
-print(USAGE_2022_ANNUAL)
-
-USAGE_AND_FINANCIALS <- left_join(USAGE_2022_ANNUAL, 
-                                  FINANCIALS, 
-                                  join_by(`NTD ID`, Mode)) |>
-  drop_na() 
+#Incomplete
