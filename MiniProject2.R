@@ -94,3 +94,30 @@ TITLE_BASICS <- TITLE_BASICS |>
 TITLE_EPISODES <- TITLE_EPISODES |>
   mutate(seasonNumber = as.numeric(seasonNumber),
          episodeNumber = as.numeric(episodeNumber))
+
+NAME_BASICS |> separate_longer_delim(knownForTitles, ",") |> slice_head(n=10)
+
+
+
+#Task 2: Instructor-Provided Questions
+movies <- TITLE_BASICS |> count(titleType) |>
+  filter(titleType == "movie")
+  print(movies)
+tvSeries <- TITLE_BASICS |> count(titleType) |>
+  filter(titleType == "tvSeries")
+  print(tvSeries)
+tvEpisodes <- TITLE_BASICS |> count(titleType) |>
+  filter(titleType == "tvEpisode")
+  print(tvEpisodes)
+  
+oldestLiving <- NAME_BASICS |> filter(birthYear > 1917, is.na(deathYear)) |>
+  arrange(birthYear) |>
+  slice(1)
+  print(oldestLiving)
+
+perfectRating <- merge(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |> 
+  filter(titleType == "tvEpisode", averageRating == 10, numVotes >= 200000)
+  print(perfectRating)
+  
+markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill")
+  print(markHamill)
