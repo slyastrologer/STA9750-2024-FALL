@@ -71,3 +71,21 @@ TITLE_PRINCIPALS <- TITLE_PRINCIPALS |>
 
 rm(TITLE_EPISODES_1)
 rm(TITLE_EPISODES_2)
+
+
+
+NAME_BASICS <- NAME_BASICS |>
+  mutate(birthYear = as.numeric(birthYear),
+         deathYear = as.numeric(deathYear))
+
+
+
+#Task 1: Column Type Correction
+TITLE_BASICS <- TITLE_BASICS |>
+  mutate(startYear = as.numeric(startYear),
+         endYear = as.numeric(endYear),
+         runtimeMinutes = as.numeric(runtimeMinutes),
+         isAdult = as.logical(isAdult))
+TITLE_EPISODES <- TITLE_EPISODES |>
+  mutate(seasonNumber = as.numeric(seasonNumber),
+         episodeNumber = as.numeric(episodeNumber))
