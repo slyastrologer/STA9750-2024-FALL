@@ -1,3 +1,8 @@
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+
 get_imdb_file <- function(fname){
   BASE_URL <- "https://datasets.imdbws.com/"
   fname_ext <- paste0(fname, ".tsv.gz")
