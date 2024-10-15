@@ -125,3 +125,15 @@ markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill") |>
 markHamilltop4 <- merge(markHamill, TITLE_BASICS, by = "tconst") |>
   slice_head(n=4)
   print(markHamilltop4)
+  
+highestAvgRate <- TITLE_BASICS |>
+  left_join(TITLE_EPISODES, by = "tconst") |>
+  left_join(TITLE_RATINGS, by = "tconst") |>
+  filter(titleType == "tvSeries") |>
+  arrange(desc(averageRating))
+  print(highestAvgRate)
+
+happyDays <- TITLE_BASICS |>
+  left_join(TITLE_EPISODES, by = "tconst") |>
+  left_join(TITLE_RATINGS, by = "tconst") |>
+  filter(primaryTitle == "Happy Days")
