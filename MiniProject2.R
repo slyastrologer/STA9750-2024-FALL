@@ -119,5 +119,9 @@ perfectRating <- merge(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |>
   filter(titleType == "tvEpisode", averageRating == 10, numVotes >= 200000)
   print(perfectRating)
   
-markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill")
-  print(markHamill)
+markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill") |>
+  separate_longer_delim(knownForTitles, ",") |> slice_head(n=4) |>
+  rename("tconst" = "knownForTitles")
+markHamilltop4 <- merge(markHamill, TITLE_BASICS, by = "tconst") |>
+  slice_head(n=4)
+  print(markHamilltop4)
