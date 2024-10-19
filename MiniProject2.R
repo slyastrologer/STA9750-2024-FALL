@@ -133,7 +133,7 @@ highestAvgRate <- TITLE_EPISODES |>
   filter(num_episodes > 12) |>
   arrange(desc(avg_rating)) |>
   rename("tconst" = "parentTconst")
-highestAvgRateName <- merge(highestAvgRate, TITLE_BASICS, by = "tconst") |>
+highestAvgRateName <- inner_join(highestAvgRate, TITLE_BASICS, by = "tconst") |>
   slice_head(n=1)
   print(highestAvgRateName)
 
