@@ -145,5 +145,11 @@ happyDays <- TITLE_BASICS |>
 
 
 #Task 3: Custom Success Metric
-successMetric <- TITLE_RATINGS |> 
-  mutate(mean(averageRating))
+TITLE_RATINGS <- TITLE_RATINGS |> 
+  filter(averageRating >= 8, numVotes >= 8000) |>
+  mutate(successRating = numVotes/averageRating) |>
+  filter(successRating >= 1000) |>
+  arrange(desc(successRating))
+
+
+  
