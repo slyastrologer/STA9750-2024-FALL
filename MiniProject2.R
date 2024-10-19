@@ -118,7 +118,7 @@ oldestLiving <- NAME_BASICS |> filter(birthYear > 1917, is.na(deathYear)) |>
 perfectRating <- merge(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |> 
   filter(titleType == "tvEpisode", averageRating == 10, numVotes >= 200000)
   print(perfectRating)
-  
+
 markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill") |>
   separate_longer_delim(knownForTitles, ",") |> slice_head(n=4) |>
   rename("tconst" = "knownForTitles")
@@ -142,3 +142,8 @@ happyDays <- TITLE_BASICS |>
   left_join(TITLE_RATINGS, by = "tconst") |>
   filter(titleType == "tvSeries", primaryTitle == "Happy Days")
 
+
+
+#Task 3: Custom Success Metric
+successMetric <- TITLE_RATINGS |> 
+  mutate(mean(averageRating))
