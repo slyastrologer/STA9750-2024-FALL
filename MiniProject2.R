@@ -126,14 +126,13 @@ markHamilltop4 <- merge(markHamill, TITLE_BASICS, by = "tconst") |>
   slice_head(n=4)
   print(markHamilltop4)
 
-highestAvgRate <- TITLE_EPISODES |>
-  inner_join(TITLE_RATINGS, by = "tconst") |>
+highestAvgRate <- full_join(TITLE_EPISODES, TITLE_RATINGS, by = "tconst") |>
   group_by(parentTconst) |>
   summarise(num_episodes = n(), avg_rating = mean(averageRating, na.rm = TRUE)) |>
   filter(num_episodes > 12) |>
   arrange(desc(avg_rating)) |>
   rename("tconst" = "parentTconst")
-highestAvgRateName <- inner_join(highestAvgRate, TITLE_BASICS, by = "tconst") |>
+highestAvgRateName <- full_join(highestAvgRate, TITLE_BASICS, by = "tconst") |>
   slice_head(n=1)
   print(highestAvgRateName)
 
@@ -149,7 +148,14 @@ TITLE_RATINGS <- TITLE_RATINGS |>
   filter(averageRating >= 8, numVotes >= 8000) |>
   mutate(successRating = numVotes/averageRating) |>
   filter(successRating >= 1000) |>
-  arrange(desc(successRating))
+  arrange(desc(successRating)) |>
+  print()
 
 
-  
+
+#Task 4: Trends in Success Over Time
+successPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
+  mutate(decade = floor(startYear / 10) * 10) |>
+  group_by(decade) |>
+  slice(which.max(successRating)) |>
+  print()
