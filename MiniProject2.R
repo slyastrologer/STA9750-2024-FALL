@@ -136,11 +136,6 @@ highestAvgRateName <- full_join(highestAvgRate, TITLE_BASICS, by = "tconst") |>
   slice_head(n=1)
   print(highestAvgRateName)
 
-happyDays <- TITLE_BASICS |>
-  left_join(TITLE_EPISODES, by = "tconst") |>
-  left_join(TITLE_RATINGS, by = "tconst") |>
-  filter(titleType == "tvSeries", primaryTitle == "Happy Days")
-
 
 
 #Task 3: Custom Success Metric
@@ -164,7 +159,7 @@ top5UnsuccessfulMovies <- TITLE_RATINGS |>
 
 
 #Task 4: Trends in Success Over Time
-success_threshold <- 8000
+success_threshold <- 1000
 TITLE_BASICS <- TITLE_BASICS |>
   separate_longer_delim(genres, ",")
 title_decades <- full_join(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |>
@@ -177,11 +172,24 @@ most_successful_genres <- success_counts |>
   group_by(decade) |>
   slice_max(success_count, n = 1, with_ties = FALSE) |>
   ungroup()
-print(most_successful_genres)
-
 ggplot(success_counts, aes(x = decade, y = success_count, fill = genres)) +
   geom_bar(stat = "identity", position = "stack") +
   labs(title = "Successful Movies by Decade and Genre", x = "Decade", y = "Success Count", fill = "Genre") +
   theme_minimal()
+
+success_threshold <- 1000
+TITLE_MOVIES <- TITLE_BASICS |>
+  full_join(TITLE_RATINGS) |>
+  filter(titleType == "movie")
+consistent_genres <- movies |>
+  group_by(genres) |> 
+  summarise(avg_score = mean(successRating), .groups = 'drop') |>
+  filter(avg_score > success_threshold) |>
+  arrange(desc(avg_score)) |>
+  print()
+ggplot(consistent_genres, aes(x = genres, y = avg_score)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  labs(title = "Most Successful Movie Genres", x = "Genre", y = "Average Score")
 
 #Task 5: Key Personnel
