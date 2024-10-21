@@ -154,8 +154,22 @@ TITLE_RATINGS <- TITLE_RATINGS |>
 
 
 #Task 4: Trends in Success Over Time
-successPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
+successfulTitlesPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
   mutate(decade = floor(startYear / 10) * 10) |>
+  group_by(decade, primaryTitle) |>
+  summarize(max_successRating = max(successRating, na.rm = TRUE)) |> 
   group_by(decade) |>
-  slice(which.max(successRating)) |>
+  filter(max_successRating == max(max_successRating)) |>
+  arrange(decade) |>
   print()
+
+successfulGenresPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
+  mutate(decade = floor(startYear / 10) * 10) |>
+  group_by(decade, genres) |>
+  summarize(max_successRating = max(successRating, na.rm = TRUE)) |>
+  group_by(decade) |>
+  filter(max_successRating == max(max_successRating)) |>
+  arrange(decade) |>
+  print()
+
+  
