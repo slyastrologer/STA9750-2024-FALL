@@ -145,31 +145,43 @@ happyDays <- TITLE_BASICS |>
 
 #Task 3: Custom Success Metric
 TITLE_RATINGS <- TITLE_RATINGS |> 
-  filter(averageRating >= 8, numVotes >= 8000) |>
-  mutate(successRating = numVotes/averageRating) |>
-  filter(successRating >= 1000) |>
+  mutate(successRating = numVotes/averageRating)
+
+top5SuccessfulMovies <- TITLE_RATINGS |>
+  inner_join(TITLE_BASICS, by = "tconst") |>
+  filter(titleType == "movie") |>
   arrange(desc(successRating)) |>
+  slice_head(n = 5) |>
+  print()
+
+top5UnsuccessfulMovies <- TITLE_RATINGS |>
+  inner_join(TITLE_BASICS, by = "tconst") |> 
+  filter(titleType == "movie", successRating < 1000, numVotes > 8000) |> 
+  arrange(desc(successRating)) |>
+  slice_tail(n = 5) |>
   print()
 
 
 
 #Task 4: Trends in Success Over Time
-successfulTitlesPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
-  mutate(decade = floor(startYear / 10) * 10) |>
-  group_by(decade, primaryTitle) |>
-  summarize(max_successRating = max(successRating, na.rm = TRUE)) |> 
-  group_by(decade) |>
-  filter(max_successRating == max(max_successRating)) |>
-  arrange(decade) |>
-  print()
-
-successfulGenresPerDecade <- inner_join(TITLE_RATINGS, TITLE_BASICS, by = "tconst") |>
-  mutate(decade = floor(startYear / 10) * 10) |>
+success_threshold <- 8000
+TITLE_BASICS <- TITLE_BASICS |>
+  separate_longer_delim(genres, ",")
+title_decades <- full_join(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |>
+  mutate(decade = floor(startYear / 10) * 10)
+success_counts <- title_decades |>
+  filter(successRating > success_threshold) |>
   group_by(decade, genres) |>
-  summarize(max_successRating = max(successRating, na.rm = TRUE)) |>
+  summarise(success_count = n(), .groups = 'drop')
+most_successful_genres <- success_counts |>
   group_by(decade) |>
-  filter(max_successRating == max(max_successRating)) |>
-  arrange(decade) |>
-  print()
+  slice_max(success_count, n = 1, with_ties = FALSE) |>
+  ungroup()
+print(most_successful_genres)
 
-  
+ggplot(success_counts, aes(x = decade, y = success_count, fill = genres)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Successful Movies by Decade and Genre", x = "Decade", y = "Success Count", fill = "Genre") +
+  theme_minimal()
+
+#Task 5: Key Personnel
