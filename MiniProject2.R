@@ -174,7 +174,8 @@ most_successful_genres <- success_counts |>
   ungroup()
 ggplot(success_counts, aes(x = decade, y = success_count, fill = genres)) +
   geom_bar(stat = "identity", position = "stack") +
-  labs(title = "Successful Movies by Decade and Genre", x = "Decade", y = "Success Count", fill = "Genre") +
+  labs(title = "Successful Movies by Decade and Genre", x = "Decade", 
+       y = "Success Count", fill = "Genre") +
   theme_minimal()
 
 success_threshold <- 1000
@@ -235,7 +236,8 @@ actor_counts <- sci_fiActorsScores |>
   summarise(movie_count = n(), .groups = 'drop') |>
   arrange(desc(movie_count)) 
 
-directors_to_plot <- c("Christopher Nolan", "Anthony Russo", "James Cameron", "George Lucas", "Denis Villeneuve")
+directors_to_plot <- c("Christopher Nolan", "Anthony Russo", "James Cameron", 
+                       "George Lucas", "Denis Villeneuve")
 director_plot <- director_counts |>
   filter(primaryName %in% directors_to_plot)
 ggplot(director_plot, aes(x = primaryName, y = movie_count)) +
