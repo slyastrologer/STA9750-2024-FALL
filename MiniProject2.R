@@ -181,7 +181,7 @@ success_threshold <- 1000
 TITLE_MOVIES <- TITLE_BASICS |>
   full_join(TITLE_RATINGS) |>
   filter(titleType == "movie")
-consistent_genres <- movies |>
+consistent_genres <- TITLE_MOVIES |>
   group_by(genres) |> 
   summarise(avg_score = mean(successRating), .groups = 'drop') |>
   filter(avg_score > success_threshold) |>
@@ -192,4 +192,48 @@ ggplot(consistent_genres, aes(x = genres, y = avg_score)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   labs(title = "Most Successful Movie Genres", x = "Genre", y = "Average Score")
 
+
+
 #Task 5: Key Personnel
+directors <- NAME_BASICS |>
+  separate_longer_delim(primaryProfession, ",") |>
+  separate_longer_delim(knownForTitles, ",") |>
+  filter(primaryProfession == "director") |>
+  filter(!is.na(birthYear), is.na(deathYear)) |>
+  rename("tconst" = "knownForTitles") |>
+  select(primaryName, birthYear, deathYear, tconst)
+sci_fi <- TITLE_BASICS |>
+  filter(titleType == "movie" & genres == "Sci-Fi") |>
+  select(tconst, primaryTitle, startYear, endYear)
+sci_fiDirectors <- inner_join(sci_fi, directors, by = "tconst")
+sci_fiDirectorsScores <- sci_fiDirectors |>
+  left_join(TITLE_RATINGS |> select(tconst, successRating), by = "tconst")
+success_threshold <- 1000
+director_counts <- sci_fiDirectorsScores |>
+  filter(successRating > success_threshold) |>
+  group_by(primaryName) |>
+  summarise(movie_count = n(), .groups = 'drop') |>
+  arrange(desc(movie_count)) |>
+  slice_head(n=10)
+
+actors <- NAME_BASICS |>
+  separate_longer_delim(primaryProfession, ",") |>
+  separate_longer_delim(knownForTitles, ",") |>
+  filter(primaryProfession == "actor") |>
+  filter(!is.na(birthYear), is.na(deathYear)) |>
+  rename("tconst" = "knownForTitles") |>
+  select(primaryName, birthYear, deathYear, tconst)
+sci_fi <- TITLE_BASICS |>
+  filter(titleType == "movie" & genres == "Sci-Fi") |>
+  select(tconst, primaryTitle, startYear, endYear)
+sci_fiActors <- inner_join(sci_fi, actors, by = "tconst")
+sci_fiActorsScores <- sci_fiActors |>
+  left_join(TITLE_RATINGS |> select(tconst, successRating), by = "tconst")
+success_threshold <- 1000
+actor_counts <- sci_fiActorsScores |>
+  filter(successRating > success_threshold) |>
+  group_by(primaryName) |>
+  summarise(movie_count = n(), .groups = 'drop') |>
+  arrange(desc(movie_count)) 
+
+
