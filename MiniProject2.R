@@ -213,8 +213,7 @@ director_counts <- sci_fiDirectorsScores |>
   filter(successRating > success_threshold) |>
   group_by(primaryName) |>
   summarise(movie_count = n(), .groups = 'drop') |>
-  arrange(desc(movie_count)) |>
-  slice_head(n=10)
+  arrange(desc(movie_count))
 
 actors <- NAME_BASICS |>
   separate_longer_delim(primaryProfession, ",") |>
@@ -236,4 +235,34 @@ actor_counts <- sci_fiActorsScores |>
   summarise(movie_count = n(), .groups = 'drop') |>
   arrange(desc(movie_count)) 
 
+directors_to_plot <- c("Christopher Nolan", "Anthony Russo", "James Cameron", "George Lucas", "Denis Villeneuve")
+director_plot <- director_counts |>
+  filter(primaryName %in% directors_to_plot)
+ggplot(director_plot, aes(x = primaryName, y = movie_count)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Successful Movie Count by Director",
+       x = "Director",
+       y = "Number of Successful Movies")
 
+library(knitr)
+actor_table <- kable(actor_counts, 
+      caption = "Successful Movie Count by Actor",
+      col.names = c("Actor", "Number of Successful Movies"),
+      format = "markdown")
+
+
+
+#Task 6: Finding a Classic Movie to Remake
+sci_fi <- TITLE_BASICS |>
+  filter(titleType == "movie" & genres == "Sci-Fi") |> 
+  select(tconst, primaryTitle, startYear, endYear)
+sci_fiHighestRatings <- sci_fi |>
+  left_join(TITLE_RATINGS |> select(tconst, successRating), by = "tconst") |>
+  arrange(desc(successRating)) |> 
+  filter(startYear <= 1999) |>
+  print()
+
+
+
+#Task 7: Write and Deliver Your Pitch
