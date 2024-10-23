@@ -95,8 +95,6 @@ TITLE_EPISODES <- TITLE_EPISODES |>
   mutate(seasonNumber = as.numeric(seasonNumber),
          episodeNumber = as.numeric(episodeNumber))
 
-NAME_BASICS |> separate_longer_delim(knownForTitles, ",") |> slice_head(n=10)
-
 
 
 #Task 2: Instructor-Provided Questions
@@ -268,3 +266,4 @@ sci_fiHighestRatings <- sci_fi |>
 
 
 #Task 7: Write and Deliver Your Pitch
+#
