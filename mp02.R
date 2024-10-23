@@ -261,6 +261,7 @@ sci_fiHighestRatings <- sci_fi |>
   left_join(TITLE_RATINGS |> select(tconst, successRating), by = "tconst") |>
   arrange(desc(successRating)) |> 
   filter(startYear <= 1999) |>
+  slice_head(n = 1) |>
   print()
 
 
