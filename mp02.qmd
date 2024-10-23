@@ -407,7 +407,7 @@ Your pitch needs to synthesize the analysis above into two to three quick and co
 If your boss approves the pitch, you will need to have a brief trailer ready for the next quarterly earnings call. The marketing department has asked that you prepare a classic 90’s style teaser for them. 
 
 
-Final Pitch
+### Final Pitch
 For the studio's upcoming film, I believe it would be most profitable to pursue a remake of 1999's The Matrix. When we look at which genre of films has most consistently produced the most successes, sci-fi clearly ranks above its nearest competitors adventure (257 points), action (1291 points), and animation (1459 points). Furthermore, to maximize the studio's return on investment for the film it would be advantageous to pursue a genre that has consistently been proven to produce successful films. 
 
 With regards to the film's director, I believe Christopher Nolan would be the studio's safest bet. Compared to his peers, Mr. Nolan ranks among the directors with the highest amount of successful sci-fi films (4) under his direction. Furthermore, Mr. Nolan has directed 2 of the most successful and critically acclaimed films of all time: The Dark Knight and Inception. Mr. Nolan has clearly demonstrated his competency in directing films - even more so films of the sci-fi genre - and it would be wise for the studio to employ him to direct the next sci-fi film. 
@@ -417,3 +417,7 @@ For the film's leading actors, I believe Chris Evans and Liam Hemsworth would be
 In determining what type of film to make, it would be advantageous to follow industry trends. The most recent trend in the film industry has been to remake nostalgic films in hopes of replicating the success of the original films. When we look at previously successful sci-fi films that have not been remade in the last 25 years, the Matrix leads over its nearest competitor, Back to the Future, by over 1.5x. With such a large gap between the first and second most successful sci-fi movies, it is clearly best for the studio to pursue a remake of 1999's The Matrix.
 
 With Mr. Nolan at the helm of a Matrix remake, supported by Mr. Evans and Mr. Hemsworth, the studio is highly likely to replicate, or even exceed, the success of the original film. Furthermore, with the original film having been released at the turn of the century (1999) and the quarter centennial fast approaching, I believe now is the best time for the studio to pursue a Matrix remake and reap the benefits of such a remake. 
+
+
+### Final Teaser
+From Christopher Nolan, the visionary mind behind The Dark Knight and Inception; and From actor Liam Hemsworth, beloved star of The Hunger Games; and From actor Chris Evans, Hollywood icon of science fiction, Comes the timeless tale The Matrix: A story of secrecy, brutality, and triumph. Coming soon to a theater near you.
