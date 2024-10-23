@@ -2,11 +2,15 @@
 title: "Mini Project 2"
 author: "Hassan Adolphus"
 ---
-### Introduction
-In this project, we will use data from the internet movie database (IMDb) to establish a set of metrics that denote a successful film. We will then use the results of our analysis to put forth a proposal for a new film, using the data to support our choices in the film's genre, director, and cast members. 
+# Introduction
+In this project, we will use data from the internet movie database (IMDB) to establish a set of metrics that denote a successful film. We will then use the results of our analysis to put forth a proposal for a new film, using the data to support our choices in the film's genre, director, and cast members. 
 
 
 
+## Starting the Project
+
+We will start our project by loading in the necessary libraries.
+```{r}
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -91,10 +95,15 @@ rm(TITLE_EPISODES_2)
 NAME_BASICS <- NAME_BASICS |>
   mutate(birthYear = as.numeric(birthYear),
          deathYear = as.numeric(deathYear))
+```
+In the code above, we are loading in and cleaning all of the film data from IMDB. We are also plotting the number of titles and the number of IMDB ratings for those titles. From the graph, we can see that most IMDB titles have less than 100 ratings.
 
 
 
-#Task 1: Column Type Correction
+## Task 1: Column Type Correction
+
+Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical.
+```{r}
 TITLE_BASICS <- TITLE_BASICS |>
   mutate(startYear = as.numeric(startYear),
          endYear = as.numeric(endYear),
@@ -103,12 +112,15 @@ TITLE_BASICS <- TITLE_BASICS |>
 TITLE_EPISODES <- TITLE_EPISODES |>
   mutate(seasonNumber = as.numeric(seasonNumber),
          episodeNumber = as.numeric(episodeNumber))
+```
+In the code above, I am correcting the data types in the TITLE_BASICS and TITLE_EPISODES tables. In TITLE_BASICS, I changed the years and film runtimes to a numeric datatype, and I made the adult-film indicator into a logical datatype. In TITLE_EPISODES, I changed the season and episode numbers to a numeric datatype. 
 
-NAME_BASICS |> separate_longer_delim(knownForTitles, ",") |> slice_head(n=10)
 
 
+## Task 2: Instructor-Provided Questions
 
-#Task 2: Instructor-Provided Questions
+1. How many movies are in our data set? How many TV series? How many TV episodes?
+```{r}
 movies <- TITLE_BASICS |> count(titleType) |>
   filter(titleType == "movie")
   print(movies)
@@ -118,23 +130,39 @@ tvSeries <- TITLE_BASICS |> count(titleType) |>
 tvEpisodes <- TITLE_BASICS |> count(titleType) |>
   filter(titleType == "tvEpisode")
   print(tvEpisodes)
-  
+```
+In the code above, I am counting the amount of datapoints for each title type, then filtering those datapoints to get the values for movies, tv series', and tv episodes. In our dataset, there are 132152 movies, 29961 tv series, and 156537 tv episodes. 
+
+2. Who is the oldest living person in our data set?
+```{r}
 oldestLiving <- NAME_BASICS |> filter(birthYear > 1917, is.na(deathYear)) |>
   arrange(birthYear) |>
   slice(1)
   print(oldestLiving)
+```
+In the code above, I am filtering for people born after the year 1917 - removing NA values in the process - and arranging the birth years from oldest to youngest. I then extract the oldest person's name. In our dataset, the oldest person is Orest Alikin.
 
+3. There is one TV Episode in this data set with a perfect 10/10 rating and at least 200,000 IMDb ratings. What is it? What series does it belong to?
+```{r}
 perfectRating <- merge(TITLE_BASICS, TITLE_RATINGS, by = "tconst") |> 
   filter(titleType == "tvEpisode", averageRating == 10, numVotes >= 200000)
   print(perfectRating)
+```
+In the code above, I am filtering for tv episodes with average ratings greater than 10 and number of votes greater than 200000. The tv episode that meets this criteria is Ozymandias in the series Breaking Bad.  
 
+4. What four projects is the actor Mark Hamill most known for?
+```{r}
 markHamill <- NAME_BASICS |> filter(primaryName == "Mark Hamill") |>
   separate_longer_delim(knownForTitles, ",") |> slice_head(n=4) |>
   rename("tconst" = "knownForTitles")
 markHamilltop4 <- merge(markHamill, TITLE_BASICS, by = "tconst") |>
   slice_head(n=4)
   print(markHamilltop4)
+```
+In the code above, I am getting the titles Mark Hamill is best known for. I am then extracting the top 4 titles. Mark Hamill is best known for his work in Star Wars Episodes 4, 5, 6, and 8.
 
+5. What TV series, with more than 12 episodes, has the highest average rating?
+```{r}
 highestAvgRate <- full_join(TITLE_EPISODES, TITLE_RATINGS, by = "tconst") |>
   group_by(parentTconst) |>
   summarise(num_episodes = n(), avg_rating = mean(averageRating, na.rm = TRUE)) |>
@@ -144,30 +172,54 @@ highestAvgRate <- full_join(TITLE_EPISODES, TITLE_RATINGS, by = "tconst") |>
 highestAvgRateName <- full_join(highestAvgRate, TITLE_BASICS, by = "tconst") |>
   slice_head(n=1)
   print(highestAvgRateName)
+```
+In the code above, I am grouping tv episodes by series and finding the average ratings of each series. Then, I am filtering for tv series' with more than 12 episodes and arranging those tv series' based on their ratings. Finally, I am extracting the tv series with the highest average ratings. The TV series with more than 12 episodes and the highest average rating is Made. 
 
 
 
-#Task 3: Custom Success Metric
+## Task 3: Custom Success Metric
+
+Success Measure
+```{r}
 TITLE_RATINGS <- TITLE_RATINGS |> 
   mutate(successRating = numVotes/averageRating)
+```
+In the code above, the success metric is being defined as the number of votes a film has divided by its average rating. 
 
+1. Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.
+```{r}
 top5SuccessfulMovies <- TITLE_RATINGS |>
   inner_join(TITLE_BASICS, by = "tconst") |>
   filter(titleType == "movie") |>
   arrange(desc(successRating)) |>
   slice_head(n = 5) |>
   print()
+```
+The top 5 films on my success metric are The Dark Knight, The Shawshank Redemption, Inception, Fight Club, and Forrest Gump. All of these movies are critically acclaimed and yielded significant profits for the studios that produced them.
 
+2. Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
+```{r}
 top5UnsuccessfulMovies <- TITLE_RATINGS |>
   inner_join(TITLE_BASICS, by = "tconst") |> 
   filter(titleType == "movie", successRating < 1000, numVotes > 8000) |> 
   arrange(desc(successRating)) |>
   slice_tail(n = 5) |>
   print()
+```
+The bottom 5 films on my success metric are Pudhu Pettai, Virumandi, Pawankhind, Thevar Magan, and Kancharapalem. Although these movies have large numbers of IMDB ratings, their relatively low average ratings contribute to a low success rating. 
+
+5. Come up with a numerical threshold for a project to be a ‘success’; that is, determine a value such that movies above the value are all “solid” or better.
+```{r}
+success_threshold <- 1000
+```
+The success threshold I decided upon was 1000 because this number implies that the minimum number of votes a film needs to be considered successful is 8000, and the minimum rating a film needs to be considered successful is an 8.0
 
 
 
-#Task 4: Trends in Success Over Time
+## Task 4: Trends in Success Over Time
+
+1. What was the genre with the most “successes” in each decade?
+```{r}
 success_threshold <- 1000
 TITLE_BASICS <- TITLE_BASICS |>
   separate_longer_delim(genres, ",")
@@ -186,7 +238,11 @@ ggplot(success_counts, aes(x = decade, y = success_count, fill = genres)) +
   labs(title = "Successful Movies by Decade and Genre", x = "Decade", 
        y = "Success Count", fill = "Genre") +
   theme_minimal()
+```
+Based on the success threshold, I counted the films that met or exceeded the threshold, then broke those films down by genre. I then split those genres up by decade to visualize the most popular genre on a per decade interval. Based on my analysis, the genre with the most successes since the 1910 decade has been drama. Prior to the 1910 decade, the most successful genre was action in the 1900 decade, and documentary in the 1890 decade. 
 
+2. What genre consistently has the most “successes”? What genre used to reliably produce “successes” and has fallen out of favor?
+```{r}
 success_threshold <- 1000
 TITLE_MOVIES <- TITLE_BASICS |>
   full_join(TITLE_RATINGS) |>
@@ -201,10 +257,15 @@ ggplot(consistent_genres, aes(x = genres, y = avg_score)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   labs(title = "Most Successful Movie Genres", x = "Genre", y = "Average Score")
+```
+Similar to my work in the previous question, I counted the films that met or exceeded the threshold, then broke those films down by genre. I then found the average success rating for each genre and ordered those genres from highest to lowest based on their success rating. Based on my analysis, the genre that most consistently produced the most successes is Sci-Fi.
 
 
 
-#Task 5: Key Personnel
+## Task 5: Key Personnel
+
+Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short “pitch” as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
+```{r}
 directors <- NAME_BASICS |>
   separate_longer_delim(primaryProfession, ",") |>
   separate_longer_delim(knownForTitles, ",") |>
@@ -224,7 +285,9 @@ director_counts <- sci_fiDirectorsScores |>
   group_by(primaryName) |>
   summarise(movie_count = n(), .groups = 'drop') |>
   arrange(desc(movie_count))
-
+```
+In the code above, I am finding living directors who have worked on sci-fi films in their careers. After I find these directors, I am counting the number of their films that meet or exceed my success metric. Then, I am ordering those directors based on the number of their films that exceed my success metric. 
+```{r}
 actors <- NAME_BASICS |>
   separate_longer_delim(primaryProfession, ",") |>
   separate_longer_delim(knownForTitles, ",") |>
@@ -244,7 +307,9 @@ actor_counts <- sci_fiActorsScores |>
   group_by(primaryName) |>
   summarise(movie_count = n(), .groups = 'drop') |>
   arrange(desc(movie_count)) 
-
+```
+Similar to my work in the previous question, in the code above, I am finding living actors who have worked on sci-fi films in their careers. After I find these actors, I am counting the number of films they have acted in that meet or exceed my success metric. Then, I am ordering those actors based on the number of films they have acted in that exceed my success metric. 
+```{r}
 directors_to_plot <- c("Christopher Nolan", "Anthony Russo", "James Cameron", 
                        "George Lucas", "Denis Villeneuve")
 director_plot <- director_counts |>
@@ -255,16 +320,23 @@ ggplot(director_plot, aes(x = primaryName, y = movie_count)) +
   labs(title = "Successful Movie Count by Director",
        x = "Director",
        y = "Number of Successful Movies")
-
+```
+From the list of directors I pulled previously, I am checking the names and number of successful films for five well-known directors in the sci-fi genre. I am then placing those values on a histogram to determine who is the most successful of the five. In this case, it is Christopher Nolan. 
+```{r}
 library(knitr)
 actor_table <- kable(actor_counts, 
       caption = "Successful Movie Count by Actor",
       col.names = c("Actor", "Number of Successful Movies"),
       format = "markdown")
+```
+From the list of actors I pulled previously, I am creating a table containing each actor's name and number of successful films. From this table, I am then looking for the names of two actors that are well-known. In this case, these actors are Chris Evans and Liam Hemsworth. 
 
 
 
-#Task 6: Finding a Classic Movie to Remake
+## Task 6: Finding a Classic Movie to Remake
+
+Find a classic movie to remake with your key talent. The original should have a large number of IMDb ratings, a high average rating, and not have been remade in the past 25 years. 
+```{r}
 sci_fi <- TITLE_BASICS |>
   filter(titleType == "movie" & genres == "Sci-Fi") |> 
   select(tconst, primaryTitle, startYear, endYear)
@@ -273,7 +345,16 @@ sci_fiHighestRatings <- sci_fi |>
   arrange(desc(successRating)) |> 
   filter(startYear <= 1999) |>
   print()
+```
+In the code above, I am finding sci-fi films that score high on my success metric and ordering those films in descending order. Then, I am filtering for films that were released no earlier than 25 years ago. After a brief search of the top films, the one most in need of a remake is The Matrix. 
 
 
 
-#Task 7: Write and Deliver Your Pitch
+## Task 7: Write and Deliver Your Pitch
+
+Now that you have completed your analysis, write an “elevator pitch” of approximately 200-250 words for your proposed Hollywood project. This is the pitch you will bring to the studio head (your boss); if the studio head likes your pitch, you will be given a small sum of money to start securing the story rights and locking down tentative deals with key talent.
+
+Your pitch needs to synthesize the analysis above into two to three quick and compelling points. (E.g., “The market for animated young adult horror musicals has grown 200% in the past decade” or “Over 90% of Director D’s movies are successes.”) You need to present the strongest argument for each element of your pitch, including genre, director, actors, and story.
+
+If your boss approves the pitch, you will need to have a brief trailer ready for the next quarterly earnings call. The marketing department has asked that you prepare a classic 90’s style teaser for them. 
+
