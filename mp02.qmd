@@ -1,7 +1,11 @@
 ---
-title: "MiniProject2"
+title: "Mini Project 2"
 author: "Hassan Adolphus"
 ---
+### Introduction
+In this project, we will use data from the internet movie database (IMDb) to establish a set of metrics that denote a successful film. We will then use the results of our analysis to put forth a proposal for a new film, using the data to support our choices in the film's genre, director, and cast members. 
+
+
 
 library(dplyr)
 library(tidyverse)
