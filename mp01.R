@@ -182,7 +182,6 @@ USAGE %>% filter(Agency == "MTA New York City Transit", month == "2024-05-01", M
 
 
 #What mode of transport had the longest average trip in May 2024?
-#N/A
 
 
 #How much did NYC subway ridership fall between April 2019 and April 2020?
@@ -201,4 +200,3 @@ Ridership_Change
 
 
 #Task 4 - Explore and Analyze
-#Test commit.
