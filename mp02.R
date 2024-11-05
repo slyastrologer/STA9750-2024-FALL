@@ -267,4 +267,4 @@ sci_fiHighestRatings <- sci_fi |>
 
 
 #Task 7: Write and Deliver Your Pitch
-#N/A
+#Pitch goes here.
