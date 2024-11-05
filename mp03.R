@@ -4,6 +4,10 @@ library(ggplot2)
 library(stringr)
 library(httr)
 
+
+
+
+
 # Base URL for downloading congressional shapefiles (substitute with the actual URL from Lewis et al. repo)
 base_url <- "https://github.com/JeffreyBLewis/congressional-district-boundaries"
 
@@ -130,3 +134,15 @@ for (congress in congresses) {
 }
 
 message("Download and unzip process completed!")
+
+
+
+
+
+library(readr)
+housevotes1976to2022 <- read_csv("dataverse_files/1976-2022-house.csv")
+View(housevotes1976to2022)
+
+library(readr)
+presidentvotes1976to2020 <- read_csv("dataverse_files2/1976-2020-president.csv")
+View(presidentvotes1976to2020)
