@@ -6,7 +6,7 @@ library(httr)
 
 
 
-
+###TASK 1###
 
 # Base URL for downloading congressional shapefiles (substitute with the actual URL from Lewis et al. repo)
 base_url <- "https://github.com/JeffreyBLewis/congressional-district-boundaries"
@@ -60,13 +60,13 @@ unzip_shapefiles <- function(download_dir) {
 }
 
 # Uncomment the following line to unzip files after downloading
-unzip_shapefiles(download_dir)
+# unzip_shapefiles(download_dir)
 
 message("Download process completed!")
 
 
 
-
+###TASK 2###
 
 # Base URL for the U.S. Census Bureau Congressional Shapefiles (this is just an example)
 # Update the base URL with the actual URL where the shapefiles are hosted.
@@ -137,14 +137,62 @@ message("Download and unzip process completed!")
 
 
 
-
+###TASK 3###
 
 library(readr)
 housevotes1976to2022 <- read_csv("dataverse_files/1976-2022-house.csv")
 View(housevotes1976to2022)
-
 library(readr)
 presidentvotes1976to2020 <- read_csv("dataverse_files2/1976-2020-president.csv")
 View(presidentvotes1976to2020)
 
-#This is a test.
+###Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?###
+
+statedistricts_1976to2022 <- housevotes1976to2022 %>%
+  group_by(year, state) %>%
+  summarise(num_districts = n_distinct(district))
+statedistricts_change <- statedistricts_1976to2022 %>%
+  spread(key = year, value = num_districts) %>%
+  rename(districts_1976 = `1976`, districts_2022 = `2022`) %>%
+  mutate(districts_change = districts_2022 - districts_1976) %>%
+  arrange(desc(districts_change))
+
+###Are there any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines?###
+
+newyorkvotes_1976to2022 <- housevotes1976to2022 %>%
+  group_by(year, state) %>%
+  filter(state == "NEW YORK")
+
+nycandidatevotes_total <- newyorkvotes_1976to2022 %>%
+  group_by(candidate, year) %>%
+  mutate(candidatetotal = sum(candidatevotes, na.rm = TRUE)) %>%
+  ungroup()
+nycandidatevotes_winner <- nycandidatevotes_total %>%
+  group_by(year, district) %>%
+  slice_max(candidatetotal, n = 1) %>%
+  select(year, candidate, candidatetotal) %>%
+  distinct(candidate, .keep_all = TRUE)
+altnycandidatevotes_total <- newyorkvotes_1976to2022 %>%
+  group_by(candidate, year) %>%
+  mutate(candidatetotal = sum(candidatevotes, na.rm = TRUE)) %>%
+  ungroup() %>%
+  filter(party == "DEMOCRAT" | party == "REPUBLICAN")
+altnycandidatevotes_winner <- nycandidatevotes_total %>%
+  group_by(year, district) %>%
+  slice_max(candidatevotes, n = 1) %>%
+  select(year, candidate, candidatevotes)
+nydifferences <- nycandidatevotes_winner != altnycandidatevotes_winner
+
+###Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state?###
+
+congressionalpartyvotes <- housevotes1976to2022 %>%
+  filter(party == "DEMOCRAT" | party == "REPUBLICAN") %>%
+  group_by(year, state, party) %>%
+  summarize(total_votes_congressional = sum(candidatevotes), .groups = 'drop')
+presidentialpartyvotes <- presidentvotes1976to2020 %>%
+  rename("party" = "party_detailed") %>%
+  filter(party == "DEMOCRAT" | party == "REPUBLICAN") %>%
+  group_by(year, state, party) %>%
+  summarize(total_votes_presidential = sum(candidatevotes), .groups = 'drop')
+congressionalandpresidential <- merge(congressionalpartyvotes, presidentialpartyvotes, by = c("year", "state", "party"), all.x = TRUE)
+congressionalandpresidential$iscongresshigher <- congressionalandpresidential$total_votes_congressional > congressionalandpresidential$total_votes_presidential
