@@ -171,18 +171,46 @@ altnycandidatevotes_winner <- nycandidatevotes_total %>%
   group_by(year, district) %>%
   slice_max(candidatevotes, n = 1) %>%
   select(year, candidate, candidatevotes)
-nydifferences <- nycandidatevotes_winner != altnycandidatevotes_winner
 
-### Do presidential candidates run ahead or run behind congressional candidates in the same state? ###
+if (any(nycandidatevotes_winner$candidate != altnycandidatevotes_winner$candidate)) {
+  print("There are elections that would have had a different outcome.")
+} else {
+  print("There are not elections that would have had a different outcome.")
+}
+
+### Do presidential candidates run ahead or run behind congressional candidates? ###
 
 congressionalpartyvotes <- housevotes1976to2022 %>%
   filter(party == "DEMOCRAT" | party == "REPUBLICAN") %>%
-  group_by(year, state, party) %>%
+  group_by(year, party) %>%
   summarize(total_votes_congressional = sum(candidatevotes), .groups = 'drop')
 presidentialpartyvotes <- presidentvotes1976to2020 %>%
   rename("party" = "party_detailed") %>%
   filter(party == "DEMOCRAT" | party == "REPUBLICAN") %>%
-  group_by(year, state, party) %>%
+  group_by(year, party) %>%
   summarize(total_votes_presidential = sum(candidatevotes), .groups = 'drop')
-congressionalandpresidential <- merge(congressionalpartyvotes, presidentialpartyvotes, by = c("year", "state", "party"), all.x = TRUE)
+congressionalandpresidential <- merge(congressionalpartyvotes, presidentialpartyvotes, by = c("year", "party"), all.x = TRUE)
 congressionalandpresidential$iscongresshigher <- congressionalandpresidential$total_votes_congressional > congressionalandpresidential$total_votes_presidential
+view(congressionalandpresidential)
+
+
+
+
+
+### TASK 4: Automate Zip File Extraction ###
+library(ggplot2)
+library(sf)
+
+if(!file.exists("nyc_borough_boundaries.zip")){
+  download.file("https://data.cityofnewyork.us/api/geospatial/tqmj-j8zm?method=export&format=Shapefile", 
+                destfile="nyc_borough_boundaries.zip")
+}
+
+##-
+td <- tempdir(); 
+zip_contents <- unzip("nyc_borough_boundaries.zip", 
+                      exdir = td)
+
+fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+nyc_sf <- read_sf(fname_shp)
+nyc_sf
