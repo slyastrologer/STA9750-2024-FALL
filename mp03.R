@@ -198,6 +198,7 @@ view(congressionalandpresidential)
 
 
 ### TASK 4: Automate Zip File Extraction ###
+
 library(ggplot2)
 library(sf)
 
@@ -206,11 +207,28 @@ if(!file.exists("nyc_borough_boundaries.zip")){
                 destfile="nyc_borough_boundaries.zip")
 }
 
-##-
-td <- tempdir(); 
-zip_contents <- unzip("nyc_borough_boundaries.zip", 
-                      exdir = td)
+# Define the function to read .shp file from a zip archive
+read_shp_from_zip <- function(zip_file) {
+  # Create a temporary directory
+  td <- tempdir(); 
+  # Extract the contents of the zip file
+  zip_contents <- unzip("nyc_borough_boundaries.zip", 
+                        exdir = td)
+  # Identify the .shp file among the extracted contents
+  fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+  # Read the shapefile into R using read_sf
+  nyc_sf <- read_sf(fname_shp)
+  return(nyc_sf)
+}
 
-fname_shp <- zip_contents[grepl("shp$", zip_contents)]
-nyc_sf <- read_sf(fname_shp)
-nyc_sf
+ggplot(nyc_sf, 
+       aes(geometry=geometry,
+           fill = shape_area)) + 
+  geom_sf()
+
+
+
+
+
+### TASK 5: Automate Zip File Extraction ###
+
