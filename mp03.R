@@ -216,10 +216,12 @@ read_shp_from_zip <- function(zip_file) {
                         exdir = td)
   # Identify the .shp file among the extracted contents
   fname_shp <- zip_contents[grepl("shp$", zip_contents)]
-  # Read the shapefile into R using read_sf
-  nyc_sf <- read_sf(fname_shp)
+  # Read the shapefile into R using st_read
+  nyc_sf <- st_read(fname_shp)
   return(nyc_sf)
 }
+
+nyc_sf <- read_shp_from_zip("nyc_borough_boundaries.zip")
 
 ggplot(nyc_sf, 
        aes(geometry=geometry,
@@ -230,5 +232,32 @@ ggplot(nyc_sf,
 
 
 
-### TASK 5: Automate Zip File Extraction ###
+### TASK 5: Chloropleth Visualization of the 2000 Presidential Election Electoral College Results ###
 
+library(ggplot2)
+library(sf)
+
+if(!file.exists("state_boundaries.zip")){
+  download.file("https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip", 
+                destfile="state_boundaries.zip")
+}
+
+# Define the function to read .shp file from a zip archive
+read_shp_from_zip <- function(zip_file) {
+  # Create a temporary directory
+  td <- tempdir(); 
+  # Extract the contents of the zip file
+  zip_contents <- unzip("state_boundaries.zip", 
+                        exdir = td)
+  # Identify the .shp file among the extracted contents
+  fname_shp <- zip_contents[grepl("shp$", zip_contents)]
+  # Read the shapefile into R using st_read
+  states_sf <- st_read(fname_shp)
+  return(states_sf)
+}
+
+states_sf <- read_shp_from_zip("state_boundaries.zip")
+
+ggplot(states_sf, 
+       aes(geometry=geometry)) + 
+  geom_sf()
