@@ -1,8 +1,9 @@
 library(dplyr)
-library(tidyverse)
-library(ggplot2)
+library(tidyr)
 library(stringr)
 library(httr)
+library(tidyverse)
+library(ggplot2)
 
 
 
@@ -258,20 +259,71 @@ read_shp_from_zip <- function(zip_file) {
 
 states_sf <- read_shp_from_zip("state_boundaries.zip")
 
-presidentvotes1976to2020 <- read_csv("dataverse_files2/1976-2020-president.csv")
-election_results_2000 <- presidentvotes1976to2020 %>% 
-  filter(year == 2000) %>%
-  filter(party_detailed == "DEMOCRAT" | party_detailed == "REPUBLICAN")
+# Reshape the wholistic dataset with an epmhasis on the 2000 election
+presidentvotes2000_summary <- presidentvotes1976to2020 %>%
+  filter(year == 2000, party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  group_by(state, party_detailed) %>%
+  summarise(candidatevotes = sum(candidatevotes), .groups = "drop") %>%
+  pivot_wider(names_from = party_detailed, values_from = candidatevotes, values_fill = list(candidatevotes = 0)) %>%
+  rename(Democratic_votes = DEMOCRAT, Republican_votes = REPUBLICAN) %>%
+  left_join(
+    presidentvotes1976to2020 %>%
+      filter(year == 2000) %>%
+      select(state, totalvotes) %>%
+      distinct(),
+    by = "state"
+  ) %>%
+  mutate(
+    Winner = case_when(
+      Democratic_votes > Republican_votes ~ "DEMOCRAT",
+      Republican_votes > Democratic_votes ~ "REPUBLICAN",
+      TRUE ~ "TIE"
+    )
+  ) %>%
+  select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
 
+# Merge the shapefiles and presidential election data
 states_sf <- states_sf %>%
   rename("state" = "NAME")
 states_sf$state <- toupper(states_sf$state)
 states_sf <- states_sf %>%
-  left_join(election_results_2000, by = c("state"))
+  left_join(presidentvotes2000_summary, by = c("state"))
 
+# Plot the presidential election data
 ggplot(data = states_sf) +
-  geom_sf(aes(fill = party_detailed)) +
-  scale_fill_manual(values = c("DEMOCRAT" = "red", "REPUBLICAN" = "blue")) +
+  geom_sf(aes(fill = Winner)) +
+  scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
   theme_minimal() +
   labs(title = "US Election Results by State (2000)", fill = "Party") +
   theme(legend.position = "bottom")
+
+
+
+
+
+### TASK 7: Evaluating Fairness of ECV Allocation Schemes ###
+
+# Modify the code to display the 2016 election
+presidentvotes2016_summary <- presidentvotes1976to2020 %>%
+  filter(year == 2016, party_detailed %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  group_by(state, party_detailed) %>%
+  summarise(candidatevotes = sum(candidatevotes), .groups = "drop") %>%
+  pivot_wider(names_from = party_detailed, values_from = candidatevotes, values_fill = list(candidatevotes = 0)) %>%
+  rename(Democratic_votes = DEMOCRAT, Republican_votes = REPUBLICAN) %>%
+  left_join(
+    presidentvotes1976to2020 %>%
+      filter(year == 2016) %>%
+      select(state, totalvotes) %>%
+      distinct(),
+    by = "state"
+  ) %>%
+  mutate(
+    Winner = case_when(
+      Democratic_votes > Republican_votes ~ "DEMOCRAT",
+      Republican_votes > Democratic_votes ~ "REPUBLICAN",
+      TRUE ~ "TIE"
+    )
+  ) %>%
+  select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
+print(presidentvotes2016_summary)
+
