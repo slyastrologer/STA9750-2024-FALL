@@ -131,10 +131,8 @@ message("Download and unzip process completed!")
 
 library(readr)
 housevotes1976to2022 <- read_csv("dataverse_files/1976-2022-house.csv")
-View(housevotes1976to2022)
 library(readr)
 presidentvotes1976to2020 <- read_csv("dataverse_files2/1976-2020-president.csv")
-View(presidentvotes1976to2020)
 
 ### States that have gained and lost the most seats in the US House of Representatives between 1976 and 2022. ###
 
@@ -289,13 +287,14 @@ states_sf$state <- toupper(states_sf$state)
 states_sf <- states_sf %>%
   left_join(presidentvotes2000_summary, by = c("state"))
 
-# Plot the presidential election data
+# Plot the presidential election data and make the map window larger
 ggplot(data = states_sf) +
   geom_sf(aes(fill = Winner)) +
   scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
   theme_minimal() +
   labs(title = "US Election Results by State (2000)", fill = "Party") +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  coord_sf(xlim = c(-130, -65), ylim = c(24, 50), expand = FALSE)
 
 
 
