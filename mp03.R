@@ -258,6 +258,20 @@ read_shp_from_zip <- function(zip_file) {
 
 states_sf <- read_shp_from_zip("state_boundaries.zip")
 
-ggplot(states_sf, 
-       aes(geometry=geometry)) + 
-  geom_sf()
+presidentvotes1976to2020 <- read_csv("dataverse_files2/1976-2020-president.csv")
+election_results_2000 <- presidentvotes1976to2020 %>% 
+  filter(year == 2000) %>%
+  filter(party_detailed == "DEMOCRAT" | party_detailed == "REPUBLICAN")
+
+states_sf <- states_sf %>%
+  rename("state" = "NAME")
+states_sf$state <- toupper(states_sf$state)
+states_sf <- states_sf %>%
+  left_join(election_results_2000, by = c("state"))
+
+ggplot(data = states_sf) +
+  geom_sf(aes(fill = party_detailed)) +
+  scale_fill_manual(values = c("DEMOCRAT" = "red", "REPUBLICAN" = "blue")) +
+  theme_minimal() +
+  labs(title = "US Election Results by State (2000)", fill = "Party") +
+  theme(legend.position = "bottom")
