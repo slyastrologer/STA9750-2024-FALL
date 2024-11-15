@@ -157,7 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>In this project, we will use election data in combination with geographical data to visualize the results of every presidential election since 1976. We will then conduct an analysis as to whether the electoral college system currently in place in the United States is fair, and determine if an alternative system should be implemented.</p>
+<p>In this project, we will use election data in combination with geographical data to analyze and visualize the results of every presidential election since 1976. We will then conduct an analysis as to whether the electoral college system currently in place in the United States is fair, and determine if an alternative system should be implemented.</p>
 <section id="task-1" class="level2">
 <h2 class="anchored" data-anchor-id="task-1">TASK 1</h2>
 <p>We will begin our work by importing the necessary libraries:</p>
@@ -180,7 +180,8 @@ Attaching package: 'dplyr'</code></pre>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ forcats   1.0.0     ✔ purrr     1.0.2
@@ -310,7 +311,7 @@ Attaching package: 'dplyr'</code></pre>
 <pre><code>Download process completed!</code></pre>
 </div>
 </div>
-<p>The code above retrieves and downloads the shapefiles for the national congressional district maps between 1976 and 2012. It also names the files based on which congress they represent, unzips the files, and saves them to a users’ local ssd.</p>
+<p>The code above retrieves and downloads the shapefiles for the national congressional district maps between 1976 and 2012. It also names the files based on which congress they represent, unzips the files, and saves them to a users’ local ssd. If the user already has a copy of the data on their local ssd, this code is skipped and a message is displayed stating the data has already been downloaded.</p>
 </section>
 <section id="task-2" class="level2">
 <h2 class="anchored" data-anchor-id="task-2">TASK 2</h2>
@@ -442,11 +443,11 @@ file</code></pre>
 <pre><code>Download and unzip process completed!</code></pre>
 </div>
 </div>
-<p>The code above retrieves and downloads the shapefiles for the national congressional district maps between 2012 and 2022. It also names the files based on the previous naming convention from task 1, unzips the files, and saves them to a users’ local ssd.</p>
+<p>The code above retrieves and downloads the shapefiles for the national congressional district maps between 2012 and 2022. It also names the files based on the naming convention from task 1, unzips the files, and saves them to a users’ local ssd. If the user already has a copy of the data on their local ssd, this code is skipped and a message is displayed stating the data has already been downloaded.</p>
 </section>
 <section id="task-3" class="level2">
 <h2 class="anchored" data-anchor-id="task-3">TASK 3</h2>
-<p>Here, we will begin exploring our vote count data. We will first determine which states lost the most congressional seats since 1976. Then, we will look specifically at election outcomes in New York to determine if those outcomes would have been different under an alternative vote-tallying system. Finally, we will examine whether presidential candidates tend to do better or worse than their congressional counterparts.</p>
+<p>Next, we will begin exploring our congressional and presidential election data. After importing the congressional and presidential election datasets - courtesy of <a href="https://electionlab.mit.edu/data#data">the MIT Election Lab</a> - we will first determine which states have lost the most congressional seats since 1976. Then, we will specifically look at election outcomes in New York State to determine if those outcomes would have been different under an alternative vote-tallying system. Finally, we will examine whether presidential candidates tend to do better or worse than their congressional counterparts in general elections.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 3: Exploration of Vote Count Data </span><span class="al">###</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -490,98 +491,1947 @@ lgl (2): writein, notes
 <span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">districts_1976 =</span> <span class="st">`</span><span class="at">1976</span><span class="st">`</span>, <span class="at">districts_2022 =</span> <span class="st">`</span><span class="at">2022</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">districts_change =</span> districts_2022 <span class="sc">-</span> districts_1976) <span class="sc">%&gt;%</span></span>
 <span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(districts_change))</span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="fu">view</span>(statedistricts_change)</span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="do">### Elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes from their “major party line” (Democrat or Republican). </span><span class="al">###</span></span>
-<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>newyorkvotes_1976to2022 <span class="ot">&lt;-</span> housevotes1976to2022 <span class="sc">%&gt;%</span></span>
-<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, state) <span class="sc">%&gt;%</span></span>
-<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="st">"NEW YORK"</span>)</span>
-<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>nycandidatevotes_total <span class="ot">&lt;-</span> newyorkvotes_1976to2022 <span class="sc">%&gt;%</span></span>
-<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(candidate, year) <span class="sc">%&gt;%</span></span>
-<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">candidatetotal =</span> <span class="fu">sum</span>(candidatevotes, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>nycandidatevotes_winner <span class="ot">&lt;-</span> nycandidatevotes_total <span class="sc">%&gt;%</span></span>
-<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, district) <span class="sc">%&gt;%</span></span>
-<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(candidatetotal, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, candidate, candidatetotal) <span class="sc">%&gt;%</span></span>
-<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(candidate, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(statedistricts_change)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 8%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">state</th>
+<th style="text-align: right;">districts_1976</th>
+<th style="text-align: right;">1978</th>
+<th style="text-align: right;">1980</th>
+<th style="text-align: right;">1982</th>
+<th style="text-align: right;">1984</th>
+<th style="text-align: right;">1986</th>
+<th style="text-align: right;">1988</th>
+<th style="text-align: right;">1990</th>
+<th style="text-align: right;">1992</th>
+<th style="text-align: right;">1994</th>
+<th style="text-align: right;">1996</th>
+<th style="text-align: right;">1998</th>
+<th style="text-align: right;">2000</th>
+<th style="text-align: right;">2002</th>
+<th style="text-align: right;">2004</th>
+<th style="text-align: right;">2006</th>
+<th style="text-align: right;">2008</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2014</th>
+<th style="text-align: right;">2016</th>
+<th style="text-align: right;">2018</th>
+<th style="text-align: right;">2020</th>
+<th style="text-align: right;">districts_2022</th>
+<th style="text-align: right;">districts_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">TEXAS</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FLORIDA</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CALIFORNIA</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARIZONA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GEORGIA</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">COLORADO</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEVADA</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NORTH CAROLINA</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WASHINGTON</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OREGON</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">UTAH</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEW MEXICO</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SOUTH CAROLINA</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TENNESSEE</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VIRGINIA</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ALABAMA</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ALASKA</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARKANSAS</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELAWARE</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HAWAII</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IDAHO</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MAINE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MARYLAND</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MINNESOTA</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MONTANA</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEBRASKA</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEW HAMPSHIRE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NORTH DAKOTA</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RHODE ISLAND</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VERMONT</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WYOMING</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CONNECTICUT</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">KANSAS</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">KENTUCKY</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MISSISSIPPI</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OKLAHOMA</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SOUTH DAKOTA</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WISCONSIN</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INDIANA</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">-2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IOWA</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LOUISIANA</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">-2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MISSOURI</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">-2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WEST VIRGINIA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">-2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MASSACHUSETTS</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">-3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEW JERSEY</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">-3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MICHIGAN</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">-6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ILLINOIS</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">-7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OHIO</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">-8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PENNSYLVANIA</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">-8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEW YORK</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">-13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DISTRICT OF COLUMBIA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes from their “major party line” (Democrat or Republican). </span><span class="al">###</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>newyorkvotes_1976to2022 <span class="ot">&lt;-</span> housevotes1976to2022 <span class="sc">%&gt;%</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, state) <span class="sc">%&gt;%</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="st">"NEW YORK"</span>)</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>nycandidatevotes_total <span class="ot">&lt;-</span> newyorkvotes_1976to2022 <span class="sc">%&gt;%</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(candidate, year) <span class="sc">%&gt;%</span></span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">candidatetotal =</span> <span class="fu">sum</span>(candidatevotes, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>nycandidatevotes_winner <span class="ot">&lt;-</span> nycandidatevotes_total <span class="sc">%&gt;%</span></span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, district) <span class="sc">%&gt;%</span></span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(candidatetotal, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, candidate, candidatetotal) <span class="sc">%&gt;%</span></span>
+<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(candidate, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Adding missing grouping variables: `district`</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>altnycandidatevotes_total <span class="ot">&lt;-</span> newyorkvotes_1976to2022 <span class="sc">%&gt;%</span></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(candidate, year) <span class="sc">%&gt;%</span></span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">candidatetotal =</span> <span class="fu">sum</span>(candidatevotes, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>)</span>
-<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>altnycandidatevotes_winner <span class="ot">&lt;-</span> nycandidatevotes_total <span class="sc">%&gt;%</span></span>
-<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, district) <span class="sc">%&gt;%</span></span>
-<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(candidatevotes, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, candidate, candidatevotes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>altnycandidatevotes_total <span class="ot">&lt;-</span> newyorkvotes_1976to2022 <span class="sc">%&gt;%</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(candidate, year) <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">candidatetotal =</span> <span class="fu">sum</span>(candidatevotes, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>)</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>altnycandidatevotes_winner <span class="ot">&lt;-</span> nycandidatevotes_total <span class="sc">%&gt;%</span></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, district) <span class="sc">%&gt;%</span></span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(candidatevotes, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, candidate, candidatevotes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Adding missing grouping variables: `district`</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">any</span>(nycandidatevotes_winner<span class="sc">$</span>candidate <span class="sc">!=</span> altnycandidatevotes_winner<span class="sc">$</span>candidate)) {</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"There are elections that would have had a different outcome."</span>)</span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"There are not elections that would have had a different outcome."</span>)</span>
-<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">any</span>(nycandidatevotes_winner<span class="sc">$</span>candidate <span class="sc">!=</span> altnycandidatevotes_winner<span class="sc">$</span>candidate)) {</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"There are elections that would have had a different outcome."</span>)</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"There are not elections that would have had a different outcome."</span>)</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "There are elections that would have had a different outcome."</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Do presidential candidates run ahead or run behind congressional candidates? </span><span class="al">###</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>congressionalpartyvotes <span class="ot">&lt;-</span> housevotes1976to2022 <span class="sc">%&gt;%</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">%&gt;%</span></span>
-<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_votes_congressional =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
-<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>presidentialpartyvotes <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
-<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"party"</span> <span class="ot">=</span> <span class="st">"party_detailed"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">%&gt;%</span></span>
-<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_votes_presidential =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
-<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>congressionalandpresidential <span class="ot">&lt;-</span> <span class="fu">merge</span>(congressionalpartyvotes, presidentialpartyvotes, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"party"</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>congressionalandpresidential<span class="sc">$</span>iscongresshigher <span class="ot">&lt;-</span> congressionalandpresidential<span class="sc">$</span>total_votes_congressional <span class="sc">&gt;</span> congressionalandpresidential<span class="sc">$</span>total_votes_presidential</span>
-<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a><span class="fu">view</span>(congressionalandpresidential)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Do presidential candidates run ahead or run behind congressional candidates? </span><span class="al">###</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>congressionalpartyvotes <span class="ot">&lt;-</span> housevotes1976to2022 <span class="sc">%&gt;%</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">%&gt;%</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_votes_congressional =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>presidentialpartyvotes <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"party"</span> <span class="ot">=</span> <span class="st">"party_detailed"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">==</span> <span class="st">"DEMOCRAT"</span> <span class="sc">|</span> party <span class="sc">==</span> <span class="st">"REPUBLICAN"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">%&gt;%</span></span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_votes_presidential =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>congressionalandpresidential <span class="ot">&lt;-</span> <span class="fu">merge</span>(congressionalpartyvotes, presidentialpartyvotes, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"party"</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>congressionalandpresidential<span class="sc">$</span>iscongresshigher <span class="ot">&lt;-</span> congressionalandpresidential<span class="sc">$</span>total_votes_congressional <span class="sc">&gt;</span> congressionalandpresidential<span class="sc">$</span>total_votes_presidential</span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(congressionalandpresidential)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 13%">
+<col style="width: 30%">
+<col style="width: 29%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">year</th>
+<th style="text-align: left;">party</th>
+<th style="text-align: right;">total_votes_congressional</th>
+<th style="text-align: right;">total_votes_presidential</th>
+<th style="text-align: left;">iscongresshigher</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1976</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">41486982</td>
+<td style="text-align: right;">40680446</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1976</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">31194553</td>
+<td style="text-align: right;">38870893</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1978</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">29129018</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1978</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">24373365</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1980</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">39119333</td>
+<td style="text-align: right;">35480948</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1980</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">37068793</td>
+<td style="text-align: right;">43642639</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1982</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">35126417</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1982</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">27610694</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1984</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">42799090</td>
+<td style="text-align: right;">37449813</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1984</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">38540768</td>
+<td style="text-align: right;">54166829</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1986</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">32338351</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1986</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">26407309</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1988</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">42324391</td>
+<td style="text-align: right;">41716679</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1988</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">37015826</td>
+<td style="text-align: right;">48642640</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1990</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">31355535</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1990</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">27402044</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1992</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">47372027</td>
+<td style="text-align: right;">44856747</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1992</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">42574193</td>
+<td style="text-align: right;">38798913</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1994</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">30659923</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1994</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">36325817</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1996</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">43598585</td>
+<td style="text-align: right;">47295351</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1996</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">43427495</td>
+<td style="text-align: right;">39003697</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1998</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">30309341</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1998</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">31920586</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">45177356</td>
+<td style="text-align: right;">49662314</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">46750176</td>
+<td style="text-align: right;">50311372</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2002</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">32601780</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2002</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">37217239</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2004</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">51345579</td>
+<td style="text-align: right;">57449547</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2004</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">55723203</td>
+<td style="text-align: right;">61872711</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2006</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">41521759</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2006</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">35835381</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2008</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">63272262</td>
+<td style="text-align: right;">69338846</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2008</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">51952377</td>
+<td style="text-align: right;">59613835</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2010</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">38614663</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2010</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">44594059</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2012</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">58503445</td>
+<td style="text-align: right;">64205850</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2012</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">57977915</td>
+<td style="text-align: right;">60670117</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">34583572</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">39926535</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">60957891</td>
+<td style="text-align: right;">65677288</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">62772633</td>
+<td style="text-align: right;">62692670</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">58919398</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">50752541</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">76879506</td>
+<td style="text-align: right;">81268908</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">72671813</td>
+<td style="text-align: right;">74216146</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2022</td>
+<td style="text-align: left;">DEMOCRAT</td>
+<td style="text-align: right;">50808690</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2022</td>
+<td style="text-align: left;">REPUBLICAN</td>
+<td style="text-align: right;">54227994</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>To answer our first question, we must calculate the difference in how many congressional seats a state had in 1976 vs 2022. We start by grouping the amount of congressional seats by state for those two years, then we subtract the 2022 value from the 1976 value. We see that since 1976, southern states have been gaining districts, while northern states have been loosing them.</p>
-<p>To answer our second question, we create two scenarios with our congressional data. In the first scenario, we examine election winners as they are with extraneous parties looped into the major political parties. However in our second scenario, we leave extraneous parties as standalone datapoints. We then add a prompt that overlays the two datasets, and if there are differing election winners, a phrase is printed. According to the code output, there are multiple elections in which the outcomes could have been different under this alternative system.</p>
-<p>To answer our final question, we start by aggregating the votes congressional and presidential candidates have gotten in each state since 1976. We then merge our two datasets and add a conditional that determines if a congresisonal candidate - based on their party - is running ahead or behind of the presidential candidate from their party. According to the code output, presidential candidates generally track in line with their party’s congressional candidates during general election years.</p>
+</div>
+<p>To answer our first question, we must calculate the difference in how many congressional seats a state had in 1976 vs 2022. We start by grouping the amount of congressional seats by state for those two years, then we subtract the 2022 value from the 1976 value. A trend we can see in the data is that since 1976, southern states have been gaining congressional districts, while northern states have been loosing them.</p>
+<p>To answer our second question, we must create two scenarios with our congressional data. In the first scenario, we examine election winners as they are with third party votes looped into the major political parties’ votes. In the second scenario, we leave third party votes as standalone datapoints. We then add a prompt that overlays the two datasets, and if there are differing election winners between the two datasets, a phrase declaring there are alternative election winners is output. Thus, based on the code output, there are elections present in our dataset in which the outcomes would have been different under an alternative vote-tallying system.</p>
+<p>To answer our final question, we must examine both our congressional and presidential datasets in tandem. We start by aggregating the votes congressional and presidential candidates have gotten in each election since 1976. We then merge our two datasets and add a conditional variable that determines if a congressional candidate is running ahead or behind of the presidential candidate from their same party in an election. Based on the output, we can determine that a presidential candidate’s votes have generally tracked in line with a congressional candidate’s votes of the same party in general election years.</p>
 </section>
 <section id="task-4" class="level2">
 <h2 class="anchored" data-anchor-id="task-4">TASK 4</h2>
-<p>Next, we will begin automating the extraction of shapefiles from zipfiles, using a shapefile of New York City as an example.</p>
+<p>Now, we will begin automating the extraction of shapefiles from zipfiles, using a shapefile of New York City as an example.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 4: Automate Zip File Extraction </span><span class="al">###</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 4: Automate Zip File Extraction </span><span class="al">###</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"nyc_borough_boundaries.zip"</span>)){</span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="st">"https://data.cityofnewyork.us/api/geospatial/tqmj-j8zm?method=export&amp;format=Shapefile"</span>, </span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">destfile=</span><span class="st">"nyc_borough_boundaries.zip"</span>)</span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function to read .shp file from a zip archive</span></span>
-<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>read_shp_from_zip <span class="ot">&lt;-</span> <span class="cf">function</span>(zip_file) {</span>
-<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a temporary directory</span></span>
-<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>  td <span class="ot">&lt;-</span> <span class="fu">tempdir</span>(); </span>
-<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract the contents of the zip file</span></span>
-<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>  zip_contents <span class="ot">&lt;-</span> <span class="fu">unzip</span>(<span class="st">"nyc_borough_boundaries.zip"</span>, </span>
-<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">exdir =</span> td)</span>
-<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identify the .shp file among the extracted contents</span></span>
-<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>  fname_shp <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shp$"</span>, zip_contents)]</span>
-<span id="cb70-15"><a href="#cb70-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Read the shapefile into R using st_read</span></span>
-<span id="cb70-16"><a href="#cb70-16" aria-hidden="true" tabindex="-1"></a>  nyc_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(fname_shp)</span>
-<span id="cb70-17"><a href="#cb70-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(nyc_sf)</span>
-<span id="cb70-18"><a href="#cb70-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb70-19"><a href="#cb70-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-20"><a href="#cb70-20" aria-hidden="true" tabindex="-1"></a>nyc_sf <span class="ot">&lt;-</span> <span class="fu">read_shp_from_zip</span>(<span class="st">"nyc_borough_boundaries.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"nyc_borough_boundaries.zip"</span>)){</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="st">"https://data.cityofnewyork.us/api/geospatial/tqmj-j8zm?method=export&amp;format=Shapefile"</span>, </span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">destfile=</span><span class="st">"nyc_borough_boundaries.zip"</span>)</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function to read .shp file from a zip archive</span></span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>read_shp_from_zip <span class="ot">&lt;-</span> <span class="cf">function</span>(zip_file) {</span>
+<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a temporary directory</span></span>
+<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>  td <span class="ot">&lt;-</span> <span class="fu">tempdir</span>(); </span>
+<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract the contents of the zip file</span></span>
+<span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a>  zip_contents <span class="ot">&lt;-</span> <span class="fu">unzip</span>(<span class="st">"nyc_borough_boundaries.zip"</span>, </span>
+<span id="cb71-12"><a href="#cb71-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">exdir =</span> td)</span>
+<span id="cb71-13"><a href="#cb71-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identify the .shp file among the extracted contents</span></span>
+<span id="cb71-14"><a href="#cb71-14" aria-hidden="true" tabindex="-1"></a>  fname_shp <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shp$"</span>, zip_contents)]</span>
+<span id="cb71-15"><a href="#cb71-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Read the shapefile into R using st_read</span></span>
+<span id="cb71-16"><a href="#cb71-16" aria-hidden="true" tabindex="-1"></a>  nyc_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(fname_shp)</span>
+<span id="cb71-17"><a href="#cb71-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(nyc_sf)</span>
+<span id="cb71-18"><a href="#cb71-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb71-19"><a href="#cb71-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-20"><a href="#cb71-20" aria-hidden="true" tabindex="-1"></a>nyc_sf <span class="ot">&lt;-</span> <span class="fu">read_shp_from_zip</span>(<span class="st">"nyc_borough_boundaries.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `geo_export_c51fcc06-25e6-459a-a42c-31d133749fee' from data source `/private/var/folders/1h/hg15hyjn4v913fkg16kz_1d40000gn/T/Rtmpd1BPRu/geo_export_c51fcc06-25e6-459a-a42c-31d133749fee.shp' 
+<pre><code>Reading layer `geo_export_c51fcc06-25e6-459a-a42c-31d133749fee' from data source `/private/var/folders/1h/hg15hyjn4v913fkg16kz_1d40000gn/T/RtmpF6SpVl/geo_export_c51fcc06-25e6-459a-a42c-31d133749fee.shp' 
   using driver `ESRI Shapefile'
 Simple feature collection with 5 features and 4 fields
 Geometry type: MULTIPOLYGON
@@ -589,10 +2439,10 @@ Dimension:     XY
 Bounding box:  xmin: -74.25559 ymin: 40.49613 xmax: -73.70001 ymax: 40.91553
 Geodetic CRS:  WGS84(DD)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(nyc_sf, </span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">geometry=</span>geometry,</span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> shape_area)) <span class="sc">+</span> </span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(nyc_sf, </span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">geometry=</span>geometry,</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> shape_area)) <span class="sc">+</span> </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -601,40 +2451,40 @@ Geodetic CRS:  WGS84(DD)</code></pre>
 </div>
 </div>
 </div>
-<p>In the code above, we are pulling in shapefile data from the city of New York into R. We are then coloring the shapefile data based on the area of New York City’s boroughs. The code in this task serves as a smaller-scale example of how we will adapt the code for a national shape-file in the next task</p>
+<p>In the code above, we are pulling in shapefile data from the City of New York into R. We are then coloring the shapefile data based on the area of New York City’s boroughs. The code in this task serves as a smaller-scale example of how we can create a similar map coloring a national shapefile based on election results.</p>
 </section>
 <section id="task-5" class="level2">
 <h2 class="anchored" data-anchor-id="task-5">TASK 5</h2>
-<p>Here, we will adapt our code from the previous task to color a national shapefile with the results of the 2000 election. We will start by importing the shapefile from the census website, then we will manipulate our presidential data from earlier to exclusively look at the resuls from the two major parties in the 2000 presidential election. Finally, we will use the results from the 2000 election to fill in our shapefile with the appropriate colors for the democratic (blue) and republican (red) parties.</p>
+<p>Next, we will adapt our code from the previous task to color a national shapefile with the results of the 2000 election. We will start by importing a national shapefile from the census website, then we will manipulate our presidential data from earlier to extract the results of the Democratic and Republican parties in the 2000 presidential election. Finally, we will use our extracted results from the 2000 election to fill in our shapefile with the appropriate colors for the Democratic (blue) and Republican (red) parties.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 5: Chloropleth Visualization of the 2000 Presidential Election Electoral College Results </span><span class="al">###</span></span>
-<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"state_boundaries.zip"</span>)){</span>
-<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="st">"https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip"</span>, </span>
-<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">destfile=</span><span class="st">"state_boundaries.zip"</span>)</span>
-<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function to read .shp file from a zip archive</span></span>
-<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>read_shp_from_zip <span class="ot">&lt;-</span> <span class="cf">function</span>(zip_file) {</span>
-<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a temporary directory</span></span>
-<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a>  td <span class="ot">&lt;-</span> <span class="fu">tempdir</span>(); </span>
-<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract the contents of the zip file</span></span>
-<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>  zip_contents <span class="ot">&lt;-</span> <span class="fu">unzip</span>(<span class="st">"state_boundaries.zip"</span>, </span>
-<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">exdir =</span> td)</span>
-<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identify the .shp file among the extracted contents</span></span>
-<span id="cb73-19"><a href="#cb73-19" aria-hidden="true" tabindex="-1"></a>  fname_shp <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shp$"</span>, zip_contents)]</span>
-<span id="cb73-20"><a href="#cb73-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Read the shapefile into R using st_read</span></span>
-<span id="cb73-21"><a href="#cb73-21" aria-hidden="true" tabindex="-1"></a>  states_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(fname_shp)</span>
-<span id="cb73-22"><a href="#cb73-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(states_sf)</span>
-<span id="cb73-23"><a href="#cb73-23" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb73-24"><a href="#cb73-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-25"><a href="#cb73-25" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> <span class="fu">read_shp_from_zip</span>(<span class="st">"state_boundaries.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 5: Chloropleth Visualization of the 2000 Presidential Election Electoral College Results </span><span class="al">###</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"state_boundaries.zip"</span>)){</span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="st">"https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_500k.zip"</span>, </span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">destfile=</span><span class="st">"state_boundaries.zip"</span>)</span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function to read .shp file from a zip archive</span></span>
+<span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a>read_shp_from_zip <span class="ot">&lt;-</span> <span class="cf">function</span>(zip_file) {</span>
+<span id="cb74-13"><a href="#cb74-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a temporary directory</span></span>
+<span id="cb74-14"><a href="#cb74-14" aria-hidden="true" tabindex="-1"></a>  td <span class="ot">&lt;-</span> <span class="fu">tempdir</span>(); </span>
+<span id="cb74-15"><a href="#cb74-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract the contents of the zip file</span></span>
+<span id="cb74-16"><a href="#cb74-16" aria-hidden="true" tabindex="-1"></a>  zip_contents <span class="ot">&lt;-</span> <span class="fu">unzip</span>(<span class="st">"state_boundaries.zip"</span>, </span>
+<span id="cb74-17"><a href="#cb74-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">exdir =</span> td)</span>
+<span id="cb74-18"><a href="#cb74-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identify the .shp file among the extracted contents</span></span>
+<span id="cb74-19"><a href="#cb74-19" aria-hidden="true" tabindex="-1"></a>  fname_shp <span class="ot">&lt;-</span> zip_contents[<span class="fu">grepl</span>(<span class="st">"shp$"</span>, zip_contents)]</span>
+<span id="cb74-20"><a href="#cb74-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Read the shapefile into R using st_read</span></span>
+<span id="cb74-21"><a href="#cb74-21" aria-hidden="true" tabindex="-1"></a>  states_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(fname_shp)</span>
+<span id="cb74-22"><a href="#cb74-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(states_sf)</span>
+<span id="cb74-23"><a href="#cb74-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb74-24"><a href="#cb74-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-25"><a href="#cb74-25" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> <span class="fu">read_shp_from_zip</span>(<span class="st">"state_boundaries.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `cb_2018_us_state_500k' from data source 
-  `/private/var/folders/1h/hg15hyjn4v913fkg16kz_1d40000gn/T/Rtmpd1BPRu/cb_2018_us_state_500k.shp' 
+  `/private/var/folders/1h/hg15hyjn4v913fkg16kz_1d40000gn/T/RtmpF6SpVl/cb_2018_us_state_500k.shp' 
   using driver `ESRI Shapefile'
 Simple feature collection with 56 features and 9 fields
 Geometry type: MULTIPOLYGON
@@ -642,44 +2492,44 @@ Dimension:     XY
 Bounding box:  xmin: -179.1489 ymin: -14.5487 xmax: 179.7785 ymax: 71.36516
 Geodetic CRS:  NAD83</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the wholistic dataset with an epmhasis on the 2000 election</span></span>
-<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>presidentvotes2000_summary <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
-<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>, party_detailed <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span>, <span class="st">"REPUBLICAN"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, party_detailed) <span class="sc">%&gt;%</span></span>
-<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">candidatevotes =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> party_detailed, <span class="at">values_from =</span> candidatevotes, <span class="at">values_fill =</span> <span class="fu">list</span>(<span class="at">candidatevotes =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Democratic_votes =</span> DEMOCRAT, <span class="at">Republican_votes =</span> REPUBLICAN) <span class="sc">%&gt;%</span></span>
-<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>    presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
-<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(state, totalvotes) <span class="sc">%&gt;%</span></span>
-<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">distinct</span>(),</span>
-<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"state"</span></span>
-<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Winner =</span> <span class="fu">case_when</span>(</span>
-<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>      Democratic_votes <span class="sc">&gt;</span> Republican_votes <span class="sc">~</span> <span class="st">"DEMOCRAT"</span>,</span>
-<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>      Republican_votes <span class="sc">&gt;</span> Democratic_votes <span class="sc">~</span> <span class="st">"REPUBLICAN"</span>,</span>
-<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"TIE"</span></span>
-<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, Democratic_votes, Republican_votes, <span class="at">Total_votes =</span> totalvotes, Winner)</span>
-<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge the shapefiles and presidential election data</span></span>
-<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> states_sf <span class="sc">%&gt;%</span></span>
-<span id="cb75-26"><a href="#cb75-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"state"</span> <span class="ot">=</span> <span class="st">"NAME"</span>)</span>
-<span id="cb75-27"><a href="#cb75-27" aria-hidden="true" tabindex="-1"></a>states_sf<span class="sc">$</span>state <span class="ot">&lt;-</span> <span class="fu">toupper</span>(states_sf<span class="sc">$</span>state)</span>
-<span id="cb75-28"><a href="#cb75-28" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> states_sf <span class="sc">%&gt;%</span></span>
-<span id="cb75-29"><a href="#cb75-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(presidentvotes2000_summary, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>))</span>
-<span id="cb75-30"><a href="#cb75-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb75-31"><a href="#cb75-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the presidential election data and make the map window larger</span></span>
-<span id="cb75-32"><a href="#cb75-32" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> states_sf) <span class="sc">+</span></span>
-<span id="cb75-33"><a href="#cb75-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Winner)) <span class="sc">+</span></span>
-<span id="cb75-34"><a href="#cb75-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"REPUBLICAN"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
-<span id="cb75-35"><a href="#cb75-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb75-36"><a href="#cb75-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"US Election Results by State (2000)"</span>, <span class="at">fill =</span> <span class="st">"Party"</span>) <span class="sc">+</span></span>
-<span id="cb75-37"><a href="#cb75-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb75-38"><a href="#cb75-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>, <span class="sc">-</span><span class="dv">65</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">50</span>), <span class="at">expand =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the wholistic dataset with an epmhasis on the 2000 election</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>presidentvotes2000_summary <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>, party_detailed <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span>, <span class="st">"REPUBLICAN"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, party_detailed) <span class="sc">%&gt;%</span></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">candidatevotes =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> party_detailed, <span class="at">values_from =</span> candidatevotes, <span class="at">values_fill =</span> <span class="fu">list</span>(<span class="at">candidatevotes =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Democratic_votes =</span> DEMOCRAT, <span class="at">Republican_votes =</span> REPUBLICAN) <span class="sc">%&gt;%</span></span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>    presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(state, totalvotes) <span class="sc">%&gt;%</span></span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">distinct</span>(),</span>
+<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"state"</span></span>
+<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Winner =</span> <span class="fu">case_when</span>(</span>
+<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>      Democratic_votes <span class="sc">&gt;</span> Republican_votes <span class="sc">~</span> <span class="st">"DEMOCRAT"</span>,</span>
+<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a>      Republican_votes <span class="sc">&gt;</span> Democratic_votes <span class="sc">~</span> <span class="st">"REPUBLICAN"</span>,</span>
+<span id="cb76-19"><a href="#cb76-19" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"TIE"</span></span>
+<span id="cb76-20"><a href="#cb76-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb76-21"><a href="#cb76-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb76-22"><a href="#cb76-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, Democratic_votes, Republican_votes, <span class="at">Total_votes =</span> totalvotes, Winner)</span>
+<span id="cb76-23"><a href="#cb76-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-24"><a href="#cb76-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge the shapefiles and presidential election data</span></span>
+<span id="cb76-25"><a href="#cb76-25" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> states_sf <span class="sc">%&gt;%</span></span>
+<span id="cb76-26"><a href="#cb76-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"state"</span> <span class="ot">=</span> <span class="st">"NAME"</span>)</span>
+<span id="cb76-27"><a href="#cb76-27" aria-hidden="true" tabindex="-1"></a>states_sf<span class="sc">$</span>state <span class="ot">&lt;-</span> <span class="fu">toupper</span>(states_sf<span class="sc">$</span>state)</span>
+<span id="cb76-28"><a href="#cb76-28" aria-hidden="true" tabindex="-1"></a>states_sf <span class="ot">&lt;-</span> states_sf <span class="sc">%&gt;%</span></span>
+<span id="cb76-29"><a href="#cb76-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(presidentvotes2000_summary, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>))</span>
+<span id="cb76-30"><a href="#cb76-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-31"><a href="#cb76-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the presidential election data and make the map window larger</span></span>
+<span id="cb76-32"><a href="#cb76-32" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> states_sf) <span class="sc">+</span></span>
+<span id="cb76-33"><a href="#cb76-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Winner)) <span class="sc">+</span></span>
+<span id="cb76-34"><a href="#cb76-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"REPUBLICAN"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb76-35"><a href="#cb76-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb76-36"><a href="#cb76-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"US Election Results by State (2000)"</span>, <span class="at">fill =</span> <span class="st">"Party"</span>) <span class="sc">+</span></span>
+<span id="cb76-37"><a href="#cb76-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb76-38"><a href="#cb76-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>, <span class="sc">-</span><span class="dv">65</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">50</span>), <span class="at">expand =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -691,54 +2541,423 @@ Geodetic CRS:  NAD83</code></pre>
 </section>
 <section id="task-7" class="level2">
 <h2 class="anchored" data-anchor-id="task-7">TASK 7</h2>
-<p>In this final task, we will evaluate the fairness of different electoral allocation schemes. We will use a combination of our presidential data from R and <a href="https://www.270towin.com">an online electoral map generator</a> to examine these schemes in the context of the 2016 general election.</p>
+<p>Finally, we will evaluate the fairness of different electoral allocation schemes. We will use a combination of our presidential election data from R and <a href="https://www.270towin.com">an online electoral map generator</a> to examine three electoral allocation schemes in the context of the 2016 general election; state-wide winner takes all, nation-wide winner takes all, and state-wide proportional vote.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 7: Evaluating Fairness of ECV Allocation Schemes </span><span class="al">###</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Modify the code to display the 2016 election</span></span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>presidentvotes2016_summary <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2016</span>, party_detailed <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span>, <span class="st">"REPUBLICAN"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, party_detailed) <span class="sc">%&gt;%</span></span>
-<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">candidatevotes =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> party_detailed, <span class="at">values_from =</span> candidatevotes, <span class="at">values_fill =</span> <span class="fu">list</span>(<span class="at">candidatevotes =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Democratic_votes =</span> DEMOCRAT, <span class="at">Republican_votes =</span> REPUBLICAN) <span class="sc">%&gt;%</span></span>
-<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>    presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
-<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2016</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(state, totalvotes) <span class="sc">%&gt;%</span></span>
-<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">distinct</span>(),</span>
-<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"state"</span></span>
-<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Winner =</span> <span class="fu">case_when</span>(</span>
-<span id="cb76-19"><a href="#cb76-19" aria-hidden="true" tabindex="-1"></a>      Democratic_votes <span class="sc">&gt;</span> Republican_votes <span class="sc">~</span> <span class="st">"DEMOCRAT"</span>,</span>
-<span id="cb76-20"><a href="#cb76-20" aria-hidden="true" tabindex="-1"></a>      Republican_votes <span class="sc">&gt;</span> Democratic_votes <span class="sc">~</span> <span class="st">"REPUBLICAN"</span>,</span>
-<span id="cb76-21"><a href="#cb76-21" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"TIE"</span></span>
-<span id="cb76-22"><a href="#cb76-22" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb76-23"><a href="#cb76-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb76-24"><a href="#cb76-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, Democratic_votes, Republican_votes, <span class="at">Total_votes =</span> totalvotes, Winner)</span>
-<span id="cb76-25"><a href="#cb76-25" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(presidentvotes2016_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 51 × 5
-   state                Democratic_votes Republican_votes Total_votes Winner    
-   &lt;chr&gt;                           &lt;dbl&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
- 1 ALABAMA                        729547          1318255     2123372 REPUBLICAN
- 2 ALASKA                         116454           163387      318608 REPUBLICAN
- 3 ARIZONA                       1161209          1252401     2573165 REPUBLICAN
- 4 ARKANSAS                       380494           684872     1130635 REPUBLICAN
- 5 CALIFORNIA                    8753788          4483810    14181595 DEMOCRAT  
- 6 COLORADO                      1338870          1202484     2780220 DEMOCRAT  
- 7 CONNECTICUT                    897572           673215     1644920 DEMOCRAT  
- 8 DELAWARE                       235603           185127      441590 DEMOCRAT  
- 9 DISTRICT OF COLUMBIA           282830            12723      312575 DEMOCRAT  
-10 FLORIDA                       4504975          4617886     9420039 REPUBLICAN
-# ℹ 41 more rows</code></pre>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="do">### </span><span class="al">TASK</span><span class="do"> 7: Evaluating Fairness of ECV Allocation Schemes </span><span class="al">###</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Modify the code to display the 2016 election</span></span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>presidentvotes2016_summary <span class="ot">&lt;-</span> presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2016</span>, party_detailed <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"DEMOCRAT"</span>, <span class="st">"REPUBLICAN"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, party_detailed) <span class="sc">%&gt;%</span></span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">candidatevotes =</span> <span class="fu">sum</span>(candidatevotes), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> party_detailed, <span class="at">values_from =</span> candidatevotes, <span class="at">values_fill =</span> <span class="fu">list</span>(<span class="at">candidatevotes =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Democratic_votes =</span> DEMOCRAT, <span class="at">Republican_votes =</span> REPUBLICAN) <span class="sc">%&gt;%</span></span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a>    presidentvotes1976to2020 <span class="sc">%&gt;%</span></span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2016</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(state, totalvotes) <span class="sc">%&gt;%</span></span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">distinct</span>(),</span>
+<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"state"</span></span>
+<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb77-17"><a href="#cb77-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb77-18"><a href="#cb77-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Winner =</span> <span class="fu">case_when</span>(</span>
+<span id="cb77-19"><a href="#cb77-19" aria-hidden="true" tabindex="-1"></a>      Democratic_votes <span class="sc">&gt;</span> Republican_votes <span class="sc">~</span> <span class="st">"DEMOCRAT"</span>,</span>
+<span id="cb77-20"><a href="#cb77-20" aria-hidden="true" tabindex="-1"></a>      Republican_votes <span class="sc">&gt;</span> Democratic_votes <span class="sc">~</span> <span class="st">"REPUBLICAN"</span>,</span>
+<span id="cb77-21"><a href="#cb77-21" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"TIE"</span></span>
+<span id="cb77-22"><a href="#cb77-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb77-23"><a href="#cb77-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb77-24"><a href="#cb77-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, Democratic_votes, Republican_votes, <span class="at">Total_votes =</span> totalvotes, Winner)</span>
+<span id="cb77-25"><a href="#cb77-25" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(presidentvotes2016_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 15%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">state</th>
+<th style="text-align: right;">Democratic_votes</th>
+<th style="text-align: right;">Republican_votes</th>
+<th style="text-align: right;">Total_votes</th>
+<th style="text-align: left;">Winner</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ALABAMA</td>
+<td style="text-align: right;">729547</td>
+<td style="text-align: right;">1318255</td>
+<td style="text-align: right;">2123372</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ALASKA</td>
+<td style="text-align: right;">116454</td>
+<td style="text-align: right;">163387</td>
+<td style="text-align: right;">318608</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ARIZONA</td>
+<td style="text-align: right;">1161209</td>
+<td style="text-align: right;">1252401</td>
+<td style="text-align: right;">2573165</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARKANSAS</td>
+<td style="text-align: right;">380494</td>
+<td style="text-align: right;">684872</td>
+<td style="text-align: right;">1130635</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CALIFORNIA</td>
+<td style="text-align: right;">8753788</td>
+<td style="text-align: right;">4483810</td>
+<td style="text-align: right;">14181595</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">COLORADO</td>
+<td style="text-align: right;">1338870</td>
+<td style="text-align: right;">1202484</td>
+<td style="text-align: right;">2780220</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CONNECTICUT</td>
+<td style="text-align: right;">897572</td>
+<td style="text-align: right;">673215</td>
+<td style="text-align: right;">1644920</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELAWARE</td>
+<td style="text-align: right;">235603</td>
+<td style="text-align: right;">185127</td>
+<td style="text-align: right;">441590</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DISTRICT OF COLUMBIA</td>
+<td style="text-align: right;">282830</td>
+<td style="text-align: right;">12723</td>
+<td style="text-align: right;">312575</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FLORIDA</td>
+<td style="text-align: right;">4504975</td>
+<td style="text-align: right;">4617886</td>
+<td style="text-align: right;">9420039</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GEORGIA</td>
+<td style="text-align: right;">1877963</td>
+<td style="text-align: right;">2089104</td>
+<td style="text-align: right;">4114732</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HAWAII</td>
+<td style="text-align: right;">266891</td>
+<td style="text-align: right;">128847</td>
+<td style="text-align: right;">437664</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IDAHO</td>
+<td style="text-align: right;">189765</td>
+<td style="text-align: right;">409055</td>
+<td style="text-align: right;">690255</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ILLINOIS</td>
+<td style="text-align: right;">3090729</td>
+<td style="text-align: right;">2146015</td>
+<td style="text-align: right;">5536424</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INDIANA</td>
+<td style="text-align: right;">1033126</td>
+<td style="text-align: right;">1557286</td>
+<td style="text-align: right;">2734958</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IOWA</td>
+<td style="text-align: right;">653669</td>
+<td style="text-align: right;">800983</td>
+<td style="text-align: right;">1565580</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">KANSAS</td>
+<td style="text-align: right;">427005</td>
+<td style="text-align: right;">671018</td>
+<td style="text-align: right;">1184402</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">KENTUCKY</td>
+<td style="text-align: right;">628854</td>
+<td style="text-align: right;">1202971</td>
+<td style="text-align: right;">1924149</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LOUISIANA</td>
+<td style="text-align: right;">780154</td>
+<td style="text-align: right;">1178638</td>
+<td style="text-align: right;">2029032</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MAINE</td>
+<td style="text-align: right;">357735</td>
+<td style="text-align: right;">335593</td>
+<td style="text-align: right;">771892</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MARYLAND</td>
+<td style="text-align: right;">1678006</td>
+<td style="text-align: right;">943428</td>
+<td style="text-align: right;">2781446</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MASSACHUSETTS</td>
+<td style="text-align: right;">1995196</td>
+<td style="text-align: right;">1090893</td>
+<td style="text-align: right;">3378821</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MICHIGAN</td>
+<td style="text-align: right;">2268839</td>
+<td style="text-align: right;">2279543</td>
+<td style="text-align: right;">4799284</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MINNESOTA</td>
+<td style="text-align: right;">1367705</td>
+<td style="text-align: right;">1322949</td>
+<td style="text-align: right;">2944782</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MISSISSIPPI</td>
+<td style="text-align: right;">485131</td>
+<td style="text-align: right;">700714</td>
+<td style="text-align: right;">1209357</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MISSOURI</td>
+<td style="text-align: right;">1071068</td>
+<td style="text-align: right;">1594511</td>
+<td style="text-align: right;">2808605</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MONTANA</td>
+<td style="text-align: right;">177709</td>
+<td style="text-align: right;">279240</td>
+<td style="text-align: right;">494526</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEBRASKA</td>
+<td style="text-align: right;">284494</td>
+<td style="text-align: right;">495961</td>
+<td style="text-align: right;">844227</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEVADA</td>
+<td style="text-align: right;">539260</td>
+<td style="text-align: right;">512058</td>
+<td style="text-align: right;">1125385</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEW HAMPSHIRE</td>
+<td style="text-align: right;">348526</td>
+<td style="text-align: right;">345790</td>
+<td style="text-align: right;">744296</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEW JERSEY</td>
+<td style="text-align: right;">2148278</td>
+<td style="text-align: right;">1601933</td>
+<td style="text-align: right;">3874046</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NEW MEXICO</td>
+<td style="text-align: right;">385234</td>
+<td style="text-align: right;">319667</td>
+<td style="text-align: right;">798319</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEW YORK</td>
+<td style="text-align: right;">4379789</td>
+<td style="text-align: right;">2527142</td>
+<td style="text-align: right;">7802084</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NORTH CAROLINA</td>
+<td style="text-align: right;">2189316</td>
+<td style="text-align: right;">2362631</td>
+<td style="text-align: right;">4741564</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NORTH DAKOTA</td>
+<td style="text-align: right;">93758</td>
+<td style="text-align: right;">216794</td>
+<td style="text-align: right;">344360</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OHIO</td>
+<td style="text-align: right;">2394164</td>
+<td style="text-align: right;">2841005</td>
+<td style="text-align: right;">5496487</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OKLAHOMA</td>
+<td style="text-align: right;">420375</td>
+<td style="text-align: right;">949136</td>
+<td style="text-align: right;">1452992</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OREGON</td>
+<td style="text-align: right;">1002106</td>
+<td style="text-align: right;">782403</td>
+<td style="text-align: right;">2001336</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PENNSYLVANIA</td>
+<td style="text-align: right;">2926441</td>
+<td style="text-align: right;">2970733</td>
+<td style="text-align: right;">6115402</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RHODE ISLAND</td>
+<td style="text-align: right;">252525</td>
+<td style="text-align: right;">180543</td>
+<td style="text-align: right;">464144</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SOUTH CAROLINA</td>
+<td style="text-align: right;">855373</td>
+<td style="text-align: right;">1155389</td>
+<td style="text-align: right;">2103027</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SOUTH DAKOTA</td>
+<td style="text-align: right;">117458</td>
+<td style="text-align: right;">227721</td>
+<td style="text-align: right;">370093</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TENNESSEE</td>
+<td style="text-align: right;">870695</td>
+<td style="text-align: right;">1522925</td>
+<td style="text-align: right;">2508027</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TEXAS</td>
+<td style="text-align: right;">3877868</td>
+<td style="text-align: right;">4685047</td>
+<td style="text-align: right;">8969226</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">UTAH</td>
+<td style="text-align: right;">310674</td>
+<td style="text-align: right;">515211</td>
+<td style="text-align: right;">1131317</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VERMONT</td>
+<td style="text-align: right;">178573</td>
+<td style="text-align: right;">95369</td>
+<td style="text-align: right;">320467</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VIRGINIA</td>
+<td style="text-align: right;">1981473</td>
+<td style="text-align: right;">1769443</td>
+<td style="text-align: right;">3982752</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WASHINGTON</td>
+<td style="text-align: right;">1742718</td>
+<td style="text-align: right;">1221747</td>
+<td style="text-align: right;">3317019</td>
+<td style="text-align: left;">DEMOCRAT</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WEST VIRGINIA</td>
+<td style="text-align: right;">188794</td>
+<td style="text-align: right;">489371</td>
+<td style="text-align: right;">713051</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WISCONSIN</td>
+<td style="text-align: right;">1382536</td>
+<td style="text-align: right;">1405284</td>
+<td style="text-align: right;">2976150</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WYOMING</td>
+<td style="text-align: right;">55973</td>
+<td style="text-align: right;">174419</td>
+<td style="text-align: right;">258788</td>
+<td style="text-align: left;">REPUBLICAN</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<p>Based on our data and the electoral maps we can produce from that data, we can identify some valuable insights based on differing electoral apportioning schemes: 1. Under a state-wide winner takes all (statewide popular vote), the winner of the 2016 election would still be Donald Trump with 305 electoral votes. 2. Under a nation-wide winner takes all (nationwide popular vote), the winner of the 2016 election would have been Hillary Clinton with over 65 million votes. 3. Under a state-wide proportional vote, Hillary Clinton would have won the 2016 election.</p>
+<p>Based on our data and the electoral maps we can produce from that data, we can identify some valuable insights based on differing electoral apportioning schemes:</p>
+<ol type="1">
+<li>Under a state-wide winner takes all (statewide popular vote), the winner of the 2016 election would still be Donald Trump with 305 electoral votes.</li>
+<li>Under a nation-wide winner takes all (nationwide popular vote), the winner of the 2016 election would have been Hillary Clinton with over 65 million votes.</li>
+<li>Under a state-wide proportional vote, Hillary Clinton would have won the 2016 election.</li>
+</ol>
+<p>Using these findings, we can craft the following “fact check”:</p>
 <p>Critics of a national popular vote often argue against adopting statewide proportional allocation of electoral votes in U.S. presidential elections, claiming it would undermine the will of the people or distort results in favor of large urban areas, which tend to lean democratic. However, the current system, in which most states use a “winner-takes-all” method, can lead to significant discrepancies between the popular vote and the final electoral outcome, as seen in the 2016 election.</p>
 <p>Based on an analysis of alternative schemes for electoral vote allocation, I believe a statewide proportional electoral vote scheme provides a fairer representation of the national popular vote in presidential elections. In the 2016 election, Donald Trump won the Electoral College despite losing the popular vote by nearly 3 million votes. This discrepancy was allowed to occur because of the “winner-takes-all” methodology used by a majority of states, in which a candidate can win all of a state’s electoral votes with just a slim margin of victory.</p>
-<p>Under a proportional allocation scheme, electoral votes would have been distributed more in line with the popular vote totals, ensuring that both popular will and state representation are reflected and respected. Under a proportional system, Hillary Clinton’s victory in larger states like California and Texas would have earned her a greater share of electoral votes, while Trump’s victories in swing states would have translated to a more accurate electoral distribution instead of an outright victory. This system not only preserves the federal structure of U.S elections, but also increases voter engagement as more people’s votes across the country would contribute to the electoral outcome.</p>
+<p>Under a proportional allocation scheme, electoral votes would have been distributed more in line with the popular vote totals, ensuring that both popular will and state representation are reflected and respected. Under a proportional system, Hillary Clinton’s victory in larger states like California and Texas would have earned her a greater share of electoral votes, while Trump’s victories in swing states like Wisconsin and Michigan would have translated to a more accurate electoral distribution instead of an outright victory. This system not only preserves the federal structure of U.S elections, but also increases voter engagement as more people’s votes across the country would contribute to the electoral outcome.</p>
 
 
 </section>
