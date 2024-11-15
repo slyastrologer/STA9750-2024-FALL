@@ -4,7 +4,7 @@ author: "Hassan Adolphus"
 editor: visual
 ---
 # Introduction
-In this project, we will use election data in combination with geographical data to visualize the results of every presidential election since 1976. We will then conduct an analysis as to whether the electoral college system currently in place in the United States is fair, and determine if an alternative system should be implemented.
+In this project, we will use election data in combination with geographical data to analyze and visualize the results of every presidential election since 1976. We will then conduct an analysis as to whether the electoral college system currently in place in the United States is fair, and determine if an alternative system should be implemented.
 
 
 
@@ -75,7 +75,7 @@ unzip_shapefiles <- function(download_dir) {
 message("Download process completed!")
 ```
 
-The code above retrieves and downloads the shapefiles for the national congressional district maps between 1976 and 2012. It also names the files based on which congress they represent, unzips the files, and saves them to a users' local ssd. 
+The code above retrieves and downloads the shapefiles for the national congressional district maps between 1976 and 2012. It also names the files based on which congress they represent, unzips the files, and saves them to a users' local ssd. If the user already has a copy of the data on their local ssd, this code is skipped and a message is displayed stating the data has already been downloaded. 
 
 
 
@@ -143,12 +143,12 @@ for (congress in congresses) {
 message("Download and unzip process completed!")
 ```
 
-The code above retrieves and downloads the shapefiles for the national congressional district maps between 2012 and 2022. It also names the files based on the previous naming convention from task 1, unzips the files, and saves them to a users' local ssd. 
+The code above retrieves and downloads the shapefiles for the national congressional district maps between 2012 and 2022. It also names the files based on the naming convention from task 1, unzips the files, and saves them to a users' local ssd. If the user already has a copy of the data on their local ssd, this code is skipped and a message is displayed stating the data has already been downloaded. 
 
 
 
 ## TASK 3
-Here, we will begin exploring our vote count data. We will first determine which states lost the most congressional seats since 1976. Then, we will look specifically at election outcomes in New York to determine if those outcomes would have been different under an alternative vote-tallying system. Finally, we will examine whether presidential candidates tend to do better or worse than their congressional counterparts. 
+Next, we will begin exploring our congressional and presidential election data. After importing the congressional and presidential election datasets - courtesy of [the MIT Election Lab](https://electionlab.mit.edu/data#data) - we will first determine which states have lost the most congressional seats since 1976. Then, we will specifically look at election outcomes in New York State to determine if those outcomes would have been different under an alternative vote-tallying system. Finally, we will examine whether presidential candidates tend to do better or worse than their congressional counterparts in general elections. 
 
 ```{r}
 ### TASK 3: Exploration of Vote Count Data ###
@@ -217,16 +217,16 @@ congressionalandpresidential$iscongresshigher <- congressionalandpresidential$to
 view(congressionalandpresidential)
 ```
 
-To answer our first question, we must calculate the difference in how many congressional seats a state had in 1976 vs 2022. We start by grouping the amount of congressional seats by state for those two years, then we subtract the 2022 value from the 1976 value. We see that since 1976, southern states have been gaining districts, while northern states have been loosing them.
+To answer our first question, we must calculate the difference in how many congressional seats a state had in 1976 vs 2022. We start by grouping the amount of congressional seats by state for those two years, then we subtract the 2022 value from the 1976 value. A trend we can see in the data is that since 1976, southern states have been gaining congressional districts, while northern states have been loosing them.
 
-To answer our second question, we create two scenarios with our congressional data. In the first scenario, we examine election winners as they are with extraneous parties looped into the major political parties. However in our second scenario, we leave extraneous parties as standalone datapoints. We then add a prompt that overlays the two datasets, and if there are differing election winners, a phrase is printed. According to the code output, there are multiple elections in which the outcomes could have been different under this alternative system.
+To answer our second question, we must create two scenarios with our congressional data. In the first scenario, we examine election winners as they are with third party votes looped into the major political parties' votes. In the second scenario, we leave third party votes as standalone datapoints. We then add a prompt that overlays the two datasets, and if there are differing election winners between the two datasets, a phrase declaring there are alternative election winners is output. Thus, based on the code output, there are elections present in our dataset in which the outcomes would have been different under an alternative vote-tallying system.
 
-To answer our final question, we start by aggregating the votes congressional and presidential candidates have gotten in each state since 1976. We then merge our two datasets and add a conditional that determines if a congresisonal candidate - based on their party - is running ahead or behind of the presidential candidate from their party. According to the code output, presidential candidates generally track in line with their party's congressional candidates during general election years. 
+To answer our final question, we must examine both our congressional and presidential datasets in tandem. We start by aggregating the votes congressional and presidential candidates have gotten in each election since 1976. We then merge our two datasets and add a conditional variable that determines if a congressional candidate is running ahead or behind of the presidential candidate from their same party in an election. Based on the output, we can determine that a presidential candidate's votes have generally tracked in line with a congressional candidate's votes of the same party in general election years. 
 
 
 
 ## TASK 4
-Next, we will begin automating the extraction of shapefiles from zipfiles, using a shapefile of New York City as an example.
+Now, we will begin automating the extraction of shapefiles from zipfiles, using a shapefile of New York City as an example.
 
 ```{r}
 ### TASK 4: Automate Zip File Extraction ###
@@ -261,12 +261,12 @@ ggplot(nyc_sf,
   geom_sf()
 ```
 
-In the code above, we are pulling in shapefile data from the city of New York into R. We are then coloring the shapefile data based on the area of New York City's boroughs. The code in this task serves as a smaller-scale example of how we will adapt the code for a national shape-file in the next task 
+In the code above, we are pulling in shapefile data from the City of New York into R. We are then coloring the shapefile data based on the area of New York City's boroughs. The code in this task serves as a smaller-scale example of how we can create a similar map coloring a national shapefile based on election results. 
 
 
 
 ## TASK 5
-Here, we will adapt our code from the previous task to color a national shapefile with the results of the 2000 election. We will start by importing the shapefile from the census website, then we will manipulate our presidential data from earlier to exclusively look at the resuls from the two major parties in the 2000 presidential election. Finally, we will use the results from the 2000 election to fill in our shapefile with the appropriate colors for the democratic (blue) and republican (red) parties.
+Next, we will adapt our code from the previous task to color a national shapefile with the results of the 2000 election. We will start by importing a national shapefile from the census website, then we will manipulate our presidential data from earlier to extract the results of the Democratic and Republican parties in the 2000 presidential election. Finally, we will use our extracted results from the 2000 election to fill in our shapefile with the appropriate colors for the Democratic (blue) and Republican (red) parties.
 
 ```{r}
 ### TASK 5: Chloropleth Visualization of the 2000 Presidential Election Electoral College Results ###
@@ -338,7 +338,7 @@ ggplot(data = states_sf) +
 
 
 ## TASK 7
-In this final task, we will evaluate the fairness of different electoral allocation schemes. We will use a combination of our presidential data from R and [an online electoral map generator](https://www.270towin.com) to examine these schemes in the context of the 2016 general election. 
+Finally, we will evaluate the fairness of different electoral allocation schemes. We will use a combination of our presidential election data from R and [an online electoral map generator](https://www.270towin.com) to examine three electoral allocation schemes in the context of the 2016 general election; state-wide winner takes all, nation-wide winner takes all, and state-wide proportional vote. 
 
 ```{r}
 ### TASK 7: Evaluating Fairness of ECV Allocation Schemes ###
@@ -369,14 +369,15 @@ print(presidentvotes2016_summary)
 ```
 
 Based on our data and the electoral maps we can produce from that data, we can identify some valuable insights based on differing electoral apportioning schemes: 
+
 1. Under a state-wide winner takes all (statewide popular vote), the winner of the 2016 election would still be Donald Trump with 305 electoral votes. 
 2. Under a nation-wide winner takes all (nationwide popular vote), the winner of the 2016 election would have been Hillary Clinton with over 65 million votes. 
 3. Under a state-wide proportional vote, Hillary Clinton would have won the 2016 election.
 
-
+Using these findings, we can craft the following "fact check":
 
 Critics of a national popular vote often argue against adopting statewide proportional allocation of electoral votes in U.S. presidential elections, claiming it would undermine the will of the people or distort results in favor of large urban areas, which tend to lean democratic. However, the current system, in which most states use a "winner-takes-all" method, can lead to significant discrepancies between the popular vote and the final electoral outcome, as seen in the 2016 election.
 
 Based on an analysis of alternative schemes for electoral vote allocation, I believe a statewide proportional electoral vote scheme provides a fairer representation of the national popular vote in presidential elections. In the 2016 election, Donald Trump won the Electoral College despite losing the popular vote by nearly 3 million votes. This discrepancy was allowed to occur because of the "winner-takes-all" methodology used by a majority of states, in which a candidate can win all of a state's electoral votes with just a slim margin of victory. 
 
-Under a proportional allocation scheme, electoral votes would have been distributed more in line with the popular vote totals, ensuring that both popular will and state representation are reflected and respected. Under a proportional system, Hillary Clinton's victory in larger states like California and Texas would have earned her a greater share of electoral votes, while Trump's victories in swing states would have translated to a more accurate electoral distribution instead of an outright victory. This system not only preserves the federal structure of U.S elections, but also increases voter engagement as more people's votes across the country would contribute to the electoral outcome. 
+Under a proportional allocation scheme, electoral votes would have been distributed more in line with the popular vote totals, ensuring that both popular will and state representation are reflected and respected. Under a proportional system, Hillary Clinton's victory in larger states like California and Texas would have earned her a greater share of electoral votes, while Trump's victories in swing states like Wisconsin and Michigan would have translated to a more accurate electoral distribution instead of an outright victory. This system not only preserves the federal structure of U.S elections, but also increases voter engagement as more people's votes across the country would contribute to the electoral outcome. 
