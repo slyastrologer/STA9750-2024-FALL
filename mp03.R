@@ -2,6 +2,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(httr)
+library(knitr)
 library(tidyverse)
 library(ggplot2)
 
@@ -144,7 +145,7 @@ statedistricts_change <- statedistricts_1976to2022 %>%
   rename(districts_1976 = `1976`, districts_2022 = `2022`) %>%
   mutate(districts_change = districts_2022 - districts_1976) %>%
   arrange(desc(districts_change))
-view(statedistricts_change)
+kable(statedistricts_change)
 
 ### Elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes from their “major party line” (Democrat or Republican). ###
 
@@ -190,7 +191,7 @@ presidentialpartyvotes <- presidentvotes1976to2020 %>%
   summarize(total_votes_presidential = sum(candidatevotes), .groups = 'drop')
 congressionalandpresidential <- merge(congressionalpartyvotes, presidentialpartyvotes, by = c("year", "party"), all.x = TRUE)
 congressionalandpresidential$iscongresshigher <- congressionalandpresidential$total_votes_congressional > congressionalandpresidential$total_votes_presidential
-view(congressionalandpresidential)
+kable(congressionalandpresidential)
 
 
 
@@ -324,5 +325,5 @@ presidentvotes2016_summary <- presidentvotes1976to2020 %>%
     )
   ) %>%
   select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
-print(presidentvotes2016_summary)
+kable(presidentvotes2016_summary)
 
