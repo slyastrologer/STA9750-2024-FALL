@@ -366,7 +366,7 @@ presidentvotes2016_summary <- presidentvotes1976to2020 %>%
     )
   ) %>%
   select(state, Democratic_votes, Republican_votes, Total_votes = totalvotes, Winner)
-print(presidentvotes2016_summary)
+kable(presidentvotes2016_summary)
 ```
 
 Based on our data and the electoral maps we can produce from that data, we can identify some valuable insights based on differing electoral apportioning schemes: 
