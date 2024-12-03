@@ -403,3 +403,156 @@ data_msciquarterlyavg <- data_msci |>
 data_msciquarterlyavg |> kable()
 
 
+
+
+
+### TASK 5: Historical Comparison ###
+#Clean up the stock market data
+data_sap500$open <- as.numeric(data_sap500$open)
+data_sap500$close <- as.numeric(data_sap500$close)
+data_msci$open <- as.numeric(data_msci$open)
+data_msci$close <- as.numeric(data_msci$close)
+
+# TRS Retirement Calculation
+calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inflation, retirement_date) {
+  # salary_data: A numeric vector of the employee's salary for the last 3 years
+  # years_served: The number of years the employee has worked
+  # data_inflation: A data frame containing 'date' and 'value' columns with CPI data
+  # retirement_date: The employee's retirement date (as a Date object)
+  
+  # 1. Calculate Final Average Salary (FAS) based on the last 3 years' salary
+  FAS <- mean(salary_data)
+  
+  # 2. Calculate the base retirement benefit
+  if (years_served <= 20) {
+    base_benefit <- 0.0167 * FAS * years_served
+  } else if (years_served == 20) {
+    base_benefit <- 0.0175 * FAS * years_served
+  } else {
+    base_benefit <- (0.35 + 0.02 * years_served) * FAS
+  }
+  
+  # 3. Convert 'retirement_date' to Date class if not already
+  retirement_date <- as.Date(retirement_date)
+  
+  # 4. Get CPI data for the period from January 2010 to the month of retirement
+  data_inflation$date <- as.Date(data_inflation$date)  # Ensure 'date' is Date class
+  
+  # Filter CPI data from January 2010 to the month of retirement
+  cpi_period <- data_inflation[data_inflation$date >= "2010-01-01" & data_inflation$date <= retirement_date, ]
+  
+  # 5. Initialize inflation adjustment
+  inflation_adjustment <- 0  # Start with no inflation adjustment
+  
+  # Loop through each month in the CPI period and calculate inflation adjustment
+  for (i in 1:nrow(cpi_period)) {
+    avg_cpi <- cpi_period$value[i]  # CPI for the current month
+    
+    # Calculate the inflation adjustment for the current month
+    monthly_inflation <- round(0.5 * avg_cpi, 1)  # 50% of the CPI, rounded to nearest 0.1%
+    monthly_inflation <- pmin(pmax(monthly_inflation, 1), 3)  # cap between 1% and 3%
+    
+    # Apply the monthly inflation adjustment to the base benefit
+    base_benefit <- base_benefit * (1 + monthly_inflation / 100)
+  }
+  
+  # Return the final adjusted retirement benefit
+  return(base_benefit)
+}
+
+
+
+
+
+
+
+#ORP Retirement Calculation
+calculate_orp_retirement_benefit <- function(salary, years_employed, current_age, retirement_age, 
+                                             data_sap500, data_msci) {
+  
+  # Define the contribution rates based on salary
+  employee_contrib_rate <- ifelse(salary <= 45000, 0.03,
+                                  ifelse(salary <= 55000, 0.035,
+                                         ifelse(salary <= 75000, 0.045,
+                                                ifelse(salary <= 100000, 0.0575, 0.06))))
+  
+  # Employer contribution rate based on years employed
+  employer_contrib_rate <- ifelse(years_employed <= 7, 0.08, 0.10)
+  
+  # Determine the asset allocation based on age groups
+  asset_allocation <- ifelse(current_age < 50, 
+                             c(US_Equities = 0.54, Int_Equities = 0.36, Bonds = 0.10),
+                             ifelse(current_age < 60, 
+                                    c(US_Equities = 0.47, Int_Equities = 0.32, Bonds = 0.21),
+                                    ifelse(current_age < 75, 
+                                           c(US_Equities = 0.34, Int_Equities = 0.23, Bonds = 0.43),
+                                           c(US_Equities = 0.19, Int_Equities = 0.13, Bonds = 0.62))))
+  
+  # Initialize the ORP balance
+  orp_balance <- 0
+  
+  # Sort data by date if not already sorted
+  data_sap500 <- data_sap500[order(data_sap500$date), ]
+  data_msci <- data_msci[order(data_msci$date), ]
+  
+  # Calculate monthly returns based on close-to-close price change
+  data_sap500$return <- c(NA, diff(data_sap500$close) / head(data_sap500$close, -1))
+  data_msci$return <- c(NA, diff(data_msci$close) / head(data_msci$close, -1))
+  
+  # Loop through each year of employment to calculate the ORP balance growth
+  for (year in 1:years_employed) {
+    
+    # Calculate annual contributions
+    employee_contribution <- salary * employee_contrib_rate
+    employer_contribution <- salary * employer_contrib_rate
+    
+    # Total annual contribution
+    total_contribution <- employee_contribution + employer_contribution
+    
+    # Add the contribution to the balance
+    orp_balance <- orp_balance + total_contribution
+    
+    # Apply market growth (monthly returns)
+    for (month in 1:12) {
+      # Check if the data has enough months for this year
+      if (month <= nrow(data_sap500) & month <= nrow(data_msci)) {
+        # Get the monthly return for US Equities and International Equities
+        us_monthly_return <- data_sap500$return[month + (year - 1) * 12]
+        int_monthly_return <- data_msci$return[month + (year - 1) * 12]
+        
+        # Apply the weighted returns based on asset allocation
+        monthly_growth <- (asset_allocation["US_Equities"] * us_monthly_return) + 
+          (asset_allocation["Int_Equities"] * int_monthly_return)
+        
+        # Update the ORP balance for this month
+        orp_balance <- orp_balance * (1 + monthly_growth)
+      }
+    }
+  }
+  
+  # Calculate the retirement balance after employment
+  retirement_balance <- orp_balance
+  
+  # Annual withdrawal at a 4% rate
+  annual_withdrawal <- retirement_balance * 0.04
+  
+  return(list("Final ORP Balance" = retirement_balance, 
+              "Annual Withdrawal (4%)" = annual_withdrawal))
+}
+
+
+
+
+salary <- 60000
+years_employed <- 15
+current_age <- 30
+retirement_age <- 65
+
+# Calculate the ORP retirement benefit
+result <- calculate_orp_retirement_benefit(salary, years_employed, current_age, retirement_age, 
+                                           data_sap500, data_msci)
+
+# Output the result
+print(result)
+
+
