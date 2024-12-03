@@ -316,4 +316,34 @@ if (status_code(response) == 200) {
 
 
 ### TASK 4: Initial Analysis ###
+# Make sure that the datatypes are in correct format
+data_inflation$date <- as.Date(data_inflation$date)
+data_inflation$value <- as.numeric(data_inflation$value)
+data_wagegrowth$date <- as.Date(data_wagegrowth$date)
+data_wagegrowth$value <- as.numeric(data_wagegrowth$value)
 
+# Merge both datasets by the 'date' column, Rescale the wage growth data, omit n/a values
+data_inflationandwages <- merge(data_inflation, data_wagegrowth, by = "date", suffixes = c("_inflation", "_wage_growth"))
+data_inflationandwages$scaled_wage_growth <- data_inflationandwages$value_wage_growth / 100000000
+data_inflationandwages <- na.omit(data_inflationandwages)
+
+# Plot the data using ggplot
+ggplot(data_inflationandwages, aes(x = date)) +
+  # Map color to a variable (in this case, a fixed name for each line)
+  geom_line(aes(y = value_inflation, color = "Inflation"), size = 1) +
+  geom_line(aes(y = scaled_wage_growth, color = "Wage Growth"), size = 1) +
+  scale_y_continuous(
+    name = "Inflation (percent)",
+    sec.axis = sec_axis(~ ., name = "Wage Growth (hundreds of millions)")
+  ) +
+  labs(
+    title = "Inflation vs Wage Growth",
+    x = "Date",
+    color = "Legend"  # Title of the legend
+  ) +
+  scale_color_manual(values = c("Inflation" = "red", "Wage Growth" = "green")) +  # Set manual colors
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"  # Position the legend at the top
+  )
