@@ -7,6 +7,7 @@ library(tidyr)
 library(tidyverse)
 library(ggplot2)
 library(sf)
+library(lubridate)
 
 
 
@@ -346,5 +347,59 @@ ggplot(data_inflationandwages, aes(x = date)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   )
+
+
+
+# Convert SAP500 columns to numeric datatypes, create a year_quarter column, group "year_quarter" to calculate average open and close prices
+data_sap500quarterlyavg <- data_sap500 |> 
+  mutate(
+    open = as.numeric(open),
+    close = as.numeric(close),
+    high = as.numeric(high),
+    low = as.numeric(low),
+    volume = as.numeric(volume),
+    date = as.Date(date),
+    year_quarter = paste(year(date), "-Q", quarter(date), sep = "")
+  ) |> 
+  group_by(year_quarter) |> 
+  summarise(
+    avg_open = mean(open, na.rm = TRUE),
+    avg_close = mean(close, na.rm = TRUE),
+    .groups = 'drop'
+  ) |>
+  rename(
+    `Year and Quarter` = year_quarter,
+    `Average Open` = avg_open,
+    `Average Close` = avg_close
+  )
+
+# Display the SAP500 results as a table
+data_sap500quarterlyavg |> kable()
+
+# Convert MSCI columns to numeric datatypes, create a year_quarter column, group "year_quarter" to calculate average open and close prices
+data_msciquarterlyavg <- data_msci |> 
+  mutate(
+    open = as.numeric(open),
+    close = as.numeric(close),
+    high = as.numeric(high),
+    low = as.numeric(low),
+    volume = as.numeric(volume),
+    date = as.Date(date),
+    year_quarter = paste(year(date), "-Q", quarter(date), sep = "")
+  ) |> 
+  group_by(year_quarter) |> 
+  summarise(
+    avg_open = mean(open, na.rm = TRUE),
+    avg_close = mean(close, na.rm = TRUE),
+    .groups = 'drop'
+  ) |>
+  rename(
+    `Year and Quarter` = year_quarter,
+    `Average Open` = avg_open,
+    `Average Close` = avg_close
+  )
+
+# Display the MSCI results as a table
+data_msciquarterlyavg |> kable()
 
 
