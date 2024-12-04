@@ -466,7 +466,7 @@ calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inf
 
 
 
-# ORP Retirement Calculation
+# ORP Retirement Calculation 
 calculate_orp <- function(age, salary, start_date, end_date, data_sap500, data_msci, data_shortdebts) {
   # Set asset allocation based on age range
   if (age >= 25 && age <= 49) {
@@ -719,6 +719,216 @@ cat("The total projected ORP withdrawl amount is", final_balance, "\n")
 
 
 ### TASK 7: Monte Carlo Analysis ###
-### 
-### 
-### 
+# TRS Bootstrap Analysis
+set.seed(123)  # Set seed for reproducibility
+
+# Function to generate synthetic salary data for an employee
+generate_salary_data <- function() {
+  # Simulating last 3 years of salary data (e.g., between $40,000 and $80,000)
+  sample(seq(40000, 80000, by = 500), 3)
+}
+
+# Function to generate synthetic life expectancy data
+generate_life_expectancy <- function() {
+  # Assume life expectancy between 25 and 35 years post-retirement
+  sample(25:35, 1)
+}
+
+# Monte Carlo Simulation to generate 200 bootstrap histories
+n_simulations <- 200
+bootstrap_histories <- list()
+
+for (i in 1:n_simulations) {
+  # Generate synthetic data
+  salary_data <- generate_salary_data()
+  years_served <- sample(10:35, 1)  # Random years of service between 10 and 35
+  retirement_date <- as.Date("2024-12-01") - sample(1:365, 1)  # Random retirement date in 2024
+  
+  # Simulate life expectancy
+  life_expectancy_years <- generate_life_expectancy()
+  
+  # Run the retirement benefit calculation function (using second function with life expectancy)
+  result <- calculate_trs_retirement_benefit(salary_data, years_served, data_inflation, retirement_date, life_expectancy_years)
+  
+  # Store the result
+  bootstrap_histories[[i]] <- result
+}
+
+# Printing some summary statistics of the total projected benefits
+total_benefits <- sapply(bootstrap_histories, function(x) x$total_projected_benefit)
+summary(total_benefits)
+
+
+
+# Extract the total projected benefits from all simulations
+total_benefits <- sapply(bootstrap_histories, function(x) x$total_projected_benefit)
+
+# Convert to a data frame for ggplot2
+benefits_df <- data.frame(total_benefit = total_benefits)
+
+# Create a histogram of the total projected benefits
+ggplot(benefits_df, aes(x = total_benefit)) +
+  geom_histogram(binwidth = 50000, color = "black", fill = "black", alpha = 0.7) +
+  labs(
+    title = "Distribution of TRS Total Projected Retirement Benefits (200 Simulations)",
+    x = "Total Projected Benefit ($)",
+    y = "Frequency"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  ) +
+  # Add summary statistics (mean and 95% CI)
+  geom_vline(aes(xintercept = mean(total_benefits)), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = median(total_benefits)), color = "green", linetype = "dashed", size = 1) +
+  annotate("text", x = mean(total_benefits), y = 5, label = paste("Mean:", round(mean(total_benefits), 2)), color = "red", hjust = 1) +
+  annotate("text", x = median(total_benefits), y = 5, label = paste("Median:", round(median(total_benefits), 2)), color = "green", hjust = 0)
+
+
+
+
+
+# ORP Bootstrap Analysis
+set.seed(123)  # Set a seed for reproducibility
+
+# Function to calculate final balance from ORP (with asset returns)
+calculate_orp <- function(age, salary, start_date, data_sap500, data_msci, data_shortdebts, life_expectancy) {
+  
+  # Set asset allocation based on age range
+  if (age >= 25 && age <= 49) {
+    allocation <- c(US = 0.54, International = 0.36, Bonds = 0.10, ShortDebt = 0)
+  } else if (age >= 50 && age <= 59) {
+    allocation <- c(US = 0.47, International = 0.32, Bonds = 0.21, ShortDebt = 0)
+  } else if (age >= 60 && age <= 74) {
+    allocation <- c(US = 0.34, International = 0.23, Bonds = 0.43, ShortDebt = 0)
+  } else if (age >= 75) {
+    allocation <- c(US = 0.19, International = 0.13, Bonds = 0.62, ShortDebt = 0.06)
+  }
+  
+  # Calculate monthly returns for each asset class
+  us_returns <- (data_sap500$close - data_sap500$open) / data_sap500$open
+  international_returns <- (data_msci$close - data_msci$open) / data_msci$open
+  shortdebt_returns <- diff(log(data_shortdebts$value))  # Logarithmic return for short-term debt
+  
+  # Salary-based contribution percentages
+  if (salary <= 45000) {
+    emp_contrib_rate <- 0.03
+  } else if (salary <= 55000) {
+    emp_contrib_rate <- 0.035
+  } else if (salary <= 75000) {
+    emp_contrib_rate <- 0.045
+  } else if (salary <= 100000) {
+    emp_contrib_rate <- 0.0575
+  } else {
+    emp_contrib_rate <- 0.06
+  }
+  
+  # Employer contribution rate (8% for first 7 years, 10% thereafter)
+  employer_contrib_rate <- ifelse(age <= 31, 0.08, 0.10)  # assuming employment starts at age 25
+  
+  # Initial account balance
+  account_balance <- 0  # Starting with no balance
+  
+  # Monthly contributions (employee + employer)
+  emp_monthly_contrib <- (emp_contrib_rate * salary) / 12
+  employer_monthly_contrib <- (employer_contrib_rate * salary) / 12
+  
+  # Withdrawals (4% annually, divided monthly)
+  annual_withdrawal_rate <- 0.04
+  monthly_withdrawal <- (annual_withdrawal_rate * salary) / 12
+  
+  # Estimate number of months until the employee's death
+  months_until_death <- (life_expectancy - age) * 12
+  date_range <- seq(1, months_until_death)  # We simulate each month
+  
+  # Loop over each month
+  for (i in 1:length(date_range)) {
+    # Monthly contributions
+    account_balance <- account_balance + emp_monthly_contrib + employer_monthly_contrib
+    
+    # Apply asset allocation returns (monthly returns)
+    us_growth <- allocation["US"] * us_returns[i %% length(us_returns) + 1]  # Wrap around if less than the number of months
+    international_growth <- allocation["International"] * international_returns[i %% length(international_returns) + 1]
+    bond_growth <- 0
+    shortdebt_growth <- allocation["ShortDebt"] * shortdebt_returns[i %% length(shortdebt_returns) + 1]
+    
+    # Update account balance with growth
+    account_balance <- account_balance * (1 + us_growth + international_growth + bond_growth + shortdebt_growth)
+    
+    # Monthly withdrawal
+    account_balance <- account_balance - monthly_withdrawal
+    
+    # Ensure account balance does not go negative (you can't withdraw more than available)
+    account_balance <- max(account_balance, 0)
+  }
+  
+  return(account_balance)
+}
+
+# Function to generate bootstrap simulations
+generate_bootstrap_histories <- function(n_simulations, data_sap500, data_msci, data_shortdebts) {
+  
+  bootstrap_histories <- list()  # To store the results of all simulations
+  
+  # Loop to generate multiple simulations (n_simulations)
+  for (i in 1:n_simulations) {
+    
+    # Randomly sample parameters for each simulation
+    age <- sample(25:75, 1)  # Random age between 25 and 75
+    salary <- sample(30000:150000, 1)  # Random salary between $30,000 and $150,000
+    start_date <- sample(seq.Date(as.Date("2000-01-01"), as.Date("2010-01-01"), by = "years"), 1)  # Random start date
+    life_expectancy <- sample(75:100, 1)  # Random life expectancy
+    
+    # Call the ORP calculation function (second version)
+    final_balance <- calculate_orp(age, salary, start_date, data_sap500, data_msci, data_shortdebts, life_expectancy)
+    
+    # Store the result for this simulation
+    bootstrap_histories[[i]] <- final_balance
+  }
+  
+  # Return the bootstrap histories
+  return(bootstrap_histories)
+}
+
+# Number of bootstrap simulations to run (e.g., 200)
+n_simulations <- 200
+
+# Call the function to generate the bootstrap histories
+bootstrap_histories <- generate_bootstrap_histories(n_simulations, data_sap500, data_msci, data_shortdebts)
+
+# Convert the bootstrap histories to a data frame
+bootstrap_results <- data.frame(final_balance = unlist(bootstrap_histories))
+
+# Printing some summary statistics of the total projected balances
+summary(bootstrap_results)
+
+
+
+# Calculate the mean and median of the final balances
+mean_balance <- mean(bootstrap_results$final_balance)
+median_balance <- median(bootstrap_results$final_balance)
+
+# Create a histogram or density plot with mean and median lines
+ggplot(bootstrap_results, aes(x = final_balance)) +
+  geom_histogram(binwidth = 5000, color = "black", fill = "skyblue", alpha = 0.7) +
+  # Add vertical lines for mean and median
+  geom_vline(aes(xintercept = mean_balance), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = median_balance), color = "green", linetype = "dashed", size = 1) +
+  # Add labels for the mean and median lines
+  annotate("text", x = mean_balance + 20000, y = 10, label = paste("Mean:", round(mean_balance, 2)), color = "red", size = 4, hjust = 0) +
+  annotate("text", x = median_balance + 20000, y = 10, label = paste("Median:", round(median_balance, 2)), color = "green", size = 4, hjust = 1) +
+  labs(
+    title = "Distribution of ORP Final Account Balances (200 Simulations)",
+    x = "Final Account Balance ($)",
+    y = "Frequency"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+
+
