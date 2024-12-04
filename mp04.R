@@ -407,11 +407,13 @@ data_msciquarterlyavg |> kable()
 
 
 ### TASK 5: Historical Comparison ###
-#Clean up the stock market data
+# Change the datatypes in the stock market data
 data_sap500$open <- as.numeric(data_sap500$open)
 data_sap500$close <- as.numeric(data_sap500$close)
 data_msci$open <- as.numeric(data_msci$open)
 data_msci$close <- as.numeric(data_msci$close)
+data_shortdebts$date <- as.Date(data_shortdebts$date)
+data_shortdebts$value <- as.numeric(data_shortdebts$value)
 
 # TRS Retirement Calculation
 calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inflation, retirement_date) {
@@ -456,7 +458,7 @@ calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inf
     base_benefit <- base_benefit * (1 + monthly_inflation / 100)
   }
   
-  # Return the final adjusted retirement benefit
+  # 6. Return the final adjusted retirement benefit
   return(base_benefit)
 }
 
@@ -466,93 +468,80 @@ calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inf
 
 
 
-#ORP Retirement Calculation
-calculate_orp_retirement_benefit <- function(salary, years_employed, current_age, retirement_age, 
-                                             data_sap500, data_msci) {
-  
-  # Define the contribution rates based on salary
-  employee_contrib_rate <- ifelse(salary <= 45000, 0.03,
-                                  ifelse(salary <= 55000, 0.035,
-                                         ifelse(salary <= 75000, 0.045,
-                                                ifelse(salary <= 100000, 0.0575, 0.06))))
-  
-  # Employer contribution rate based on years employed
-  employer_contrib_rate <- ifelse(years_employed <= 7, 0.08, 0.10)
-  
-  # Determine the asset allocation based on age groups
-  asset_allocation <- ifelse(current_age < 50, 
-                             c(US_Equities = 0.54, Int_Equities = 0.36, Bonds = 0.10),
-                             ifelse(current_age < 60, 
-                                    c(US_Equities = 0.47, Int_Equities = 0.32, Bonds = 0.21),
-                                    ifelse(current_age < 75, 
-                                           c(US_Equities = 0.34, Int_Equities = 0.23, Bonds = 0.43),
-                                           c(US_Equities = 0.19, Int_Equities = 0.13, Bonds = 0.62))))
-  
-  # Initialize the ORP balance
-  orp_balance <- 0
-  
-  # Sort data by date if not already sorted
-  data_sap500 <- data_sap500[order(data_sap500$date), ]
-  data_msci <- data_msci[order(data_msci$date), ]
-  
-  # Calculate monthly returns based on close-to-close price change
-  data_sap500$return <- c(NA, diff(data_sap500$close) / head(data_sap500$close, -1))
-  data_msci$return <- c(NA, diff(data_msci$close) / head(data_msci$close, -1))
-  
-  # Loop through each year of employment to calculate the ORP balance growth
-  for (year in 1:years_employed) {
-    
-    # Calculate annual contributions
-    employee_contribution <- salary * employee_contrib_rate
-    employer_contribution <- salary * employer_contrib_rate
-    
-    # Total annual contribution
-    total_contribution <- employee_contribution + employer_contribution
-    
-    # Add the contribution to the balance
-    orp_balance <- orp_balance + total_contribution
-    
-    # Apply market growth (monthly returns)
-    for (month in 1:12) {
-      # Check if the data has enough months for this year
-      if (month <= nrow(data_sap500) & month <= nrow(data_msci)) {
-        # Get the monthly return for US Equities and International Equities
-        us_monthly_return <- data_sap500$return[month + (year - 1) * 12]
-        int_monthly_return <- data_msci$return[month + (year - 1) * 12]
-        
-        # Apply the weighted returns based on asset allocation
-        monthly_growth <- (asset_allocation["US_Equities"] * us_monthly_return) + 
-          (asset_allocation["Int_Equities"] * int_monthly_return)
-        
-        # Update the ORP balance for this month
-        orp_balance <- orp_balance * (1 + monthly_growth)
-      }
-    }
+# ORP Retirement Calculation
+calculate_orp <- function(age, salary, start_date, end_date, data_sap500, data_msci, data_shortdebts) {
+  # Set asset allocation based on age range
+  if (age >= 25 && age <= 49) {
+    allocation <- c(US = 0.54, International = 0.36, Bonds = 0.10, ShortDebt = 0)
+  } else if (age >= 50 && age <= 59) {
+    allocation <- c(US = 0.47, International = 0.32, Bonds = 0.21, ShortDebt = 0)
+  } else if (age >= 60 && age <= 74) {
+    allocation <- c(US = 0.34, International = 0.23, Bonds = 0.43, ShortDebt = 0)
+  } else if (age >= 75) {
+    allocation <- c(US = 0.19, International = 0.13, Bonds = 0.62, ShortDebt = 0.06)
   }
   
-  # Calculate the retirement balance after employment
-  retirement_balance <- orp_balance
+  # Calculate market returns for each asset class
+  us_returns <- (data_sap500$close - data_sap500$open) / data_sap500$open
+  international_returns <- (data_msci$close - data_msci$open) / data_msci$open
+  shortdebt_returns <- diff(log(data_shortdebts$value)) # assuming logarithmic return
+  bond_returns <- rep(0, length(data_sap500$date)) # assuming bonds return 0 if not specified
   
-  # Annual withdrawal at a 4% rate
-  annual_withdrawal <- retirement_balance * 0.04
+  # Salary-based contribution percentages
+  if (salary <= 45000) {
+    emp_contrib_rate <- 0.03
+  } else if (salary <= 55000) {
+    emp_contrib_rate <- 0.035
+  } else if (salary <= 75000) {
+    emp_contrib_rate <- 0.045
+  } else if (salary <= 100000) {
+    emp_contrib_rate <- 0.0575
+  } else {
+    emp_contrib_rate <- 0.06
+  }
   
-  return(list("Final ORP Balance" = retirement_balance, 
-              "Annual Withdrawal (4%)" = annual_withdrawal))
+  # Employer contribution rate (8% for first 7 years, 10% thereafter)
+  employer_contrib_rate <- ifelse(age <= 31, 0.08, 0.10)  # assuming employment starts at age 25
+  
+  # Initial account balance
+  account_balance <- 0  # Starting with no balance
+  
+  # Monthly contributions (employee + employer)
+  emp_monthly_contrib <- (emp_contrib_rate * salary) / 12
+  employer_monthly_contrib <- (employer_contrib_rate * salary) / 12
+  
+  # Withdrawals (4% annually, divided monthly)
+  annual_withdrawal_rate <- 0.04
+  monthly_withdrawal <- (annual_withdrawal_rate * salary) / 12
+  
+  # Date range for simulation
+  date_range <- seq.Date(as.Date(start_date), as.Date(end_date), by = "month")
+  
+  # Loop over each month
+  for (i in 1:length(date_range)) {
+    # Monthly contributions
+    account_balance <- account_balance + emp_monthly_contrib + employer_monthly_contrib
+    
+    # Apply asset allocation returns
+    us_growth <- allocation["US"] * us_returns[i %% length(us_returns) + 1]  # Wrap around if less than the number of months
+    international_growth <- allocation["International"] * international_returns[i %% length(international_returns) + 1]
+    bond_growth <- allocation["Bonds"] * bond_returns[i %% length(bond_returns) + 1]
+    shortdebt_growth <- allocation["ShortDebt"] * shortdebt_returns[i %% length(shortdebt_returns) + 1]
+    
+    # Update account balance with growth
+    account_balance <- account_balance * (1 + us_growth + international_growth + bond_growth + shortdebt_growth)
+    
+    # Monthly withdrawal
+    account_balance <- account_balance - monthly_withdrawal
+  }
+  
+  return(account_balance)
 }
 
 
 
+final_balance <- calculate_orp(age = 30, salary = 50000, start_date = "2023-01-01", end_date = "2023-04-01", 
+                               data_sap500 = data_sap500, data_msci = data_msci, data_shortdebts = data_shortdebts)
 
-salary <- 60000
-years_employed <- 15
-current_age <- 30
-retirement_age <- 65
-
-# Calculate the ORP retirement benefit
-result <- calculate_orp_retirement_benefit(salary, years_employed, current_age, retirement_age, 
-                                           data_sap500, data_msci)
-
-# Output the result
-print(result)
-
-
+# Print the final account balance
+print(paste("Final account balance: $", round(final_balance, 2), sep = ""))
