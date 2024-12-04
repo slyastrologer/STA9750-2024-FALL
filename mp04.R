@@ -698,7 +698,7 @@ calculate_orp <- function(age, salary, start_date, data_sap500, data_msci, data_
 salary_data <- c(70000, 75000, 80000)
 years_served <- 14
 retirement_date <- "2010-02-09"
-life_expectancy_years = 40
+life_expectancy_years = 80
 
 result <- calculate_trs_retirement_benefit(salary_data, years_served, data_inflation, retirement_date, life_expectancy_years)
 cat("The total projected TRS pension benefit is", result$total_projected_benefit, "\n")
@@ -706,7 +706,7 @@ cat("The total projected TRS pension benefit is", result$total_projected_benefit
 
 
 # Projected total ORP amount
-age <- 40
+age <- 66
 salary <- 80000
 start_date <- "2010-02-09"
 life_expectancy = 80
