@@ -415,6 +415,8 @@ data_msci$close <- as.numeric(data_msci$close)
 data_shortdebts$date <- as.Date(data_shortdebts$date)
 data_shortdebts$value <- as.numeric(data_shortdebts$value)
 
+
+
 # TRS Retirement Calculation
 calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inflation, retirement_date) {
   # salary_data: A numeric vector of the employee's salary for the last 3 years
@@ -461,10 +463,6 @@ calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inf
   # 6. Return the final adjusted retirement benefit
   return(base_benefit)
 }
-
-
-
-
 
 
 
@@ -539,9 +537,3 @@ calculate_orp <- function(age, salary, start_date, end_date, data_sap500, data_m
 }
 
 
-
-final_balance <- calculate_orp(age = 30, salary = 50000, start_date = "2023-01-01", end_date = "2023-04-01", 
-                               data_sap500 = data_sap500, data_msci = data_msci, data_shortdebts = data_shortdebts)
-
-# Print the final account balance
-print(paste("Final account balance: $", round(final_balance, 2), sep = ""))
