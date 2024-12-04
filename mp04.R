@@ -537,3 +537,188 @@ calculate_orp <- function(age, salary, start_date, end_date, data_sap500, data_m
 }
 
 
+
+# TRS Retirement Example
+salary_data <- c(70000, 75000, 80000)
+years_served <- 14
+retirement_date <- "2024-02-09"
+
+adjusted_benefit <- calculate_trs_retirement_benefit(salary_data, years_served, data_inflation, retirement_date)
+cat("The TRS Retirement balance in month 1 is", adjusted_benefit, "\n")
+
+
+
+# ORP Example
+age <- 75
+salary <- 80000
+start_date <- "2010-01-01"
+end_date <- "2024-02-09"
+
+final_balance <- calculate_orp(age, salary, start_date, end_date, data_sap500, data_msci, data_shortdebts)
+cat("The ORP balance in month 1 is", round(final_balance, 2), "\n")
+
+
+
+
+
+### TASK 6: Fixed-Rate Analysis ###
+calculate_trs_retirement_benefit <- function(salary_data, years_served, data_inflation, retirement_date, life_expectancy_years) {
+  # salary_data: A numeric vector of the employee's salary for the last 3 years
+  # years_served: The number of years the employee has worked
+  # data_inflation: A data frame containing 'date' and 'value' columns with CPI data
+  # retirement_date: The employee's retirement date (as a Date object)
+  # life_expectancy_years: The expected years the employee will live post-retirement (default = 30)
+  
+  # 1. Calculate Final Average Salary (FAS) based on the last 3 years' salary
+  FAS <- mean(salary_data)
+  
+  # 2. Calculate the base retirement benefit
+  if (years_served <= 20) {
+    base_benefit <- 0.0167 * FAS * years_served
+  } else if (years_served == 20) {
+    base_benefit <- 0.0175 * FAS * years_served
+  } else {
+    base_benefit <- (0.35 + 0.02 * years_served) * FAS
+  }
+  
+  # 3. Convert 'retirement_date' to Date class if not already
+  retirement_date <- as.Date(retirement_date)
+  
+  # 4. Get CPI data for the period from January 2010 to the year of retirement
+  data_inflation$date <- as.Date(data_inflation$date)  # Ensure 'date' is Date class
+  
+  # Filter CPI data from January 2010 to the year of retirement
+  cpi_period <- data_inflation[data_inflation$date >= "2010-01-01" & data_inflation$date <= retirement_date, ]
+  
+  # 5. Calculate the average inflation over the last 3 years
+  start_date <- as.Date(format(retirement_date, "%Y-01-01")) - 365 * 3  # Calculate the date 3 years before retirement
+  inflation_period <- data_inflation[data_inflation$date >= start_date, ]
+  avg_inflation <- mean(inflation_period$value) / 100  # Convert CPI to decimal (e.g., 2.5% -> 0.025)
+  
+  # 6. Apply inflation adjustments annually and project pension benefit until death
+  projected_benefit <- numeric(life_expectancy_years)
+  projected_benefit[1] <- base_benefit  # Initial benefit at retirement
+  
+  # Project the benefit over the years of retirement
+  for (year in 2:life_expectancy_years) {
+    # Apply COLA adjustment annually
+    adjusted_benefit <- projected_benefit[year - 1] * (1 + avg_inflation)
+    projected_benefit[year] <- adjusted_benefit
+  }
+  
+  # 7. Calculate the total projected pension benefit over the retirement period
+  total_projected_benefit <- sum(projected_benefit)
+  
+  # 8. Return the projected pension benefit over the retirement period and the total sum
+  list(
+    projected_benefit = projected_benefit,  # Return the projected benefits for each year
+    total_projected_benefit = total_projected_benefit  # Return the total sum of projected benefits
+  )
+}
+
+
+
+calculate_orp <- function(age, salary, start_date, data_sap500, data_msci, data_shortdebts, life_expectancy) {
+  
+  # Set asset allocation based on age range
+  if (age >= 25 && age <= 49) {
+    allocation <- c(US = 0.54, International = 0.36, Bonds = 0.10, ShortDebt = 0)
+  } else if (age >= 50 && age <= 59) {
+    allocation <- c(US = 0.47, International = 0.32, Bonds = 0.21, ShortDebt = 0)
+  } else if (age >= 60 && age <= 74) {
+    allocation <- c(US = 0.34, International = 0.23, Bonds = 0.43, ShortDebt = 0)
+  } else if (age >= 75) {
+    allocation <- c(US = 0.19, International = 0.13, Bonds = 0.62, ShortDebt = 0.06)
+  }
+  
+  # Calculate long-run average market returns for each asset class (e.g., last 10 years)
+  us_avg_return <- mean((data_sap500$close - data_sap500$open) / data_sap500$open, na.rm = TRUE)
+  international_avg_return <- mean((data_msci$close - data_msci$open) / data_msci$open, na.rm = TRUE)
+  shortdebt_avg_return <- mean(diff(log(data_shortdebts$value)), na.rm = TRUE)
+  bond_avg_return <- 0  # assuming bonds return 0 if not specified
+  
+  # Salary-based contribution percentages
+  if (salary <= 45000) {
+    emp_contrib_rate <- 0.03
+  } else if (salary <= 55000) {
+    emp_contrib_rate <- 0.035
+  } else if (salary <= 75000) {
+    emp_contrib_rate <- 0.045
+  } else if (salary <= 100000) {
+    emp_contrib_rate <- 0.0575
+  } else {
+    emp_contrib_rate <- 0.06
+  }
+  
+  # Employer contribution rate (8% for first 7 years, 10% thereafter)
+  employer_contrib_rate <- ifelse(age <= 31, 0.08, 0.10)  # assuming employment starts at age 25
+  
+  # Initial account balance
+  account_balance <- 0  # Starting with no balance
+  
+  # Monthly contributions (employee + employer)
+  emp_monthly_contrib <- (emp_contrib_rate * salary) / 12
+  employer_monthly_contrib <- (employer_contrib_rate * salary) / 12
+  
+  # Withdrawals (4% annually, divided monthly)
+  annual_withdrawal_rate <- 0.04
+  monthly_withdrawal <- (annual_withdrawal_rate * salary) / 12
+  
+  # Estimate number of months until the employee's death
+  months_until_death <- (life_expectancy - age) * 12
+  date_range <- seq(1, months_until_death)  # We simulate each month
+  
+  # Loop over each month
+  for (i in 1:length(date_range)) {
+    # Monthly contributions
+    account_balance <- account_balance + emp_monthly_contrib + employer_monthly_contrib
+    
+    # Apply asset allocation returns (using long-run average returns)
+    us_growth <- allocation["US"] * us_avg_return
+    international_growth <- allocation["International"] * international_avg_return
+    bond_growth <- allocation["Bonds"] * bond_avg_return
+    shortdebt_growth <- allocation["ShortDebt"] * shortdebt_avg_return
+    
+    # Update account balance with growth
+    account_balance <- account_balance * (1 + us_growth + international_growth + bond_growth + shortdebt_growth)
+    
+    # Monthly withdrawal
+    account_balance <- account_balance - monthly_withdrawal
+    
+    # Ensure account balance does not go negative (you can't withdraw more than available)
+    account_balance <- max(account_balance, 0)
+  }
+  
+  return(account_balance)
+}
+
+
+
+# Projected total TRS pension
+salary_data <- c(70000, 75000, 80000)
+years_served <- 14
+retirement_date <- "2010-02-09"
+life_expectancy_years = 40
+
+result <- calculate_trs_retirement_benefit(salary_data, years_served, data_inflation, retirement_date, life_expectancy_years)
+cat("The total projected TRS pension benefit is", result$total_projected_benefit, "\n")
+
+
+
+# Projected total ORP amount
+age <- 40
+salary <- 80000
+start_date <- "2010-02-09"
+life_expectancy = 80
+
+final_balance <- calculate_orp(age, salary, start_date, data_sap500, data_msci, data_shortdebts, life_expectancy)
+cat("The total projected ORP withdrawl amount is", final_balance, "\n")
+
+
+
+
+
+### TASK 7: Monte Carlo Analysis ###
+### 
+### 
+### 
