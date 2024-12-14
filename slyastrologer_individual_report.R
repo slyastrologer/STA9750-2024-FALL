@@ -1,8 +1,11 @@
 # Install and load the necessary packages
 library(readr)
 library(dplyr)
+library(tidyr)
 library(lubridate)
 library(ggplot2)
+
+
 
 
 
@@ -32,6 +35,8 @@ ggplot(mtafarerevenue2019to2024, aes(x = Month, y = Fare_Revenue)) +
   theme_minimal() +
   scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
 
 
 
@@ -80,3 +85,57 @@ suppressWarnings(
     scale_color_manual(values = c("UBER" = "black", "LYFT" = "pink")) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 )
+
+
+
+
+
+# Combine, clean, and plot the MTA, Uber, and Lyft Data
+# Step 1: Filter the data for 2019 onward
+mtafarerevenue2019to2024 <- mtafarerevenue2019to2024 %>%
+  filter(Month >= "2019-01-01")
+rideshare_stats2017to2024 <- rideshare_stats2017to2024 %>%
+  filter(date >= "2019-01-01")
+
+# Step 2: Separate the rideshare data into Uber and Lyft
+rideshare_uber <- rideshare_stats2017to2024 %>%
+  filter(base_name == "UBER")
+rideshare_lyft <- rideshare_stats2017to2024 %>%
+  filter(base_name == "LYFT")
+
+# Step 3: Merge the datasets
+# Ensure the "Month" and "date" columns are of Date class for proper merging
+mtafarerevenue2019to2024$Month <- as.Date(mtafarerevenue2019to2024$Month)
+rideshare_uber$date <- as.Date(rideshare_uber$date)
+rideshare_lyft$date <- as.Date(rideshare_lyft$date)
+# Merge the MTA dataset with the Uber and Lyft datasets by month
+merged_data_uber <- left_join(mtafarerevenue2019to2024, rideshare_uber, by = c("Month" = "date"))
+merged_data_lyft <- left_join(mtafarerevenue2019to2024, rideshare_lyft, by = c("Month" = "date"))
+
+# Step 4: Combine the data for plotting
+combined_data <- bind_rows(
+  merged_data_uber %>% 
+    select(Month, Fare_Revenue, total_estimated_revenue) %>%
+    mutate(Rideshare = "UBER", Revenue = total_estimated_revenue),
+  
+  merged_data_lyft %>% 
+    select(Month, Fare_Revenue, total_estimated_revenue) %>%
+    mutate(Rideshare = "LYFT", Revenue = total_estimated_revenue)
+) %>%
+  mutate(Rideshare = factor(Rideshare, levels = c("UBER", "LYFT")))  # Ensure UBER and LYFT are factors for proper coloring
+
+# Step 5: Plot the data
+ggplot(combined_data, aes(x = Month)) +
+  geom_line(aes(y = Fare_Revenue, color = "MTA Fare Revenue"), size = 1) +
+  geom_line(aes(y = Revenue, color = Rideshare), size = 1) +
+  labs(
+    title = "Revenue Comparison: MTA vs Rideshare (UBER & LYFT)",
+    x = "Month",
+    y = "Revenue",
+    color = "Legend"
+  ) +
+  scale_color_manual(values = c("MTA Fare Revenue" = "blue", "UBER" = "black", "LYFT" = "pink")) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+
