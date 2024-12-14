@@ -1,0 +1,27 @@
+---
+title: "slyastrologer_individual_report"
+author: "Hassan Adolphus"
+editor: visual
+code-fold: true
+---
+
+# FINAL INDIVIDUAL REPORT: SLYASTROLOGER
+
+## INTRODUCTION
+
+In March 2020, the Coronavirus-19 (COVID-19) pandemic that began in China reached America's shores. What followed was a year and a half of stay-at-home orders, social distancing measures, and economic decline both in the United States and abroad. New York City was hit the hardest during the pandemic, with the city recording the most deaths and new cases in the country for nearly two months after the onset of its first cases. For New York City's world-famous subway system, the pandemic brought economic ruin that, as we will explore in this report, has yet to be remedied nearly five years later. Using publicly available fiscal data (with a close examination of revenue data) collected primarily from the New York City Metropolitan Transportation Agency (NYCMTA), this report explores how the New York City Subway system has recovered since the onset of the COVID-19 pandemic, and examines whether two phenoma - the use of ride-share services such as Uber and Lyft, and the proliferation of remote work - have hindered or promoted the economic recovery of the NYCMTA. 
+
+## TASK 1: Identifying Specific Questions
+
+
+
+## TASK 2: Idenitfying Data Sources
+
+## TASK 3: Data Import and Data Cleaning
+
+## TASK 4: Data Analysis and Data Visualization
+
+## TASK 5: Findings and Insights
+
+## CONCLUSION
+
