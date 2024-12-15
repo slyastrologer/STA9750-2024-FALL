@@ -139,3 +139,6 @@ ggplot(combined_data, aes(x = Month)) +
   theme(legend.position = "top")
 
 
+
+
+
