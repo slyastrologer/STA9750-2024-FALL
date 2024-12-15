@@ -1,4 +1,4 @@
-# Install and load the necessary packages
+# Load the necessary packages
 library(readr)
 library(dplyr)
 library(tidyr)

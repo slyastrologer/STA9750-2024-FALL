@@ -9,19 +9,77 @@ code-fold: true
 
 ## INTRODUCTION
 
-In March 2020, the Coronavirus-19 (COVID-19) pandemic that began in China reached America's shores. What followed was a year and a half of stay-at-home orders, social distancing measures, and economic decline both in the United States and abroad. New York City was hit the hardest during the pandemic, with the city recording the most deaths and new cases in the country for nearly two months after the onset of its first cases. For New York City's world-famous subway system, the pandemic brought economic ruin that, as we will explore in this report, has yet to be remedied nearly five years later. Using publicly available fiscal data (with a close examination of revenue data) collected primarily from the New York City Metropolitan Transportation Agency (NYCMTA), this report explores how the New York City Subway system has recovered since the onset of the COVID-19 pandemic, and examines whether two phenoma - the use of ride-share services such as Uber and Lyft, and the proliferation of remote work - have hindered or promoted the economic recovery of the NYCMTA. 
+In March 2020, the Coronavirus-19 (COVID-19) pandemic that began in China reached America's shores. What followed was a year and a half of stay-at-home orders, social distancing measures, and economic decline both in the United States and abroad. New York City was hit the hardest during the pandemic, with the city recording the most deaths and new cases in the country for nearly two months after the onset of its first cases. For New York City's world-famous subway system, the pandemic brought economic ruin that, as I will explore in this report, has yet to be remedied nearly five years later. Using publicly available fiscal data (with a close examination of revenue data) collected primarily from the New York City Metropolitan Transportation Agency (NYCMTA), this report explores how the New York City Subway system has recovered since the onset of the COVID-19 pandemic, and examines whether two phenoma - the use of ride-share services such as Uber and Lyft, and the proliferation of remote work - have hindered or promoted the economic recovery of the NYCMTA. 
 
 ## TASK 1: Identifying Specific Questions
 
-
+To assess the economic health of the MTA, I focused on measuring the flow of money into the subway system, specifically through fare revenue, as it constitutes the majority of the MTA's funding. In examining the factors that might impact these revenues, I identified two key external influences: pre-pandemic, I decided to look at the rise of rideshare companies - such as Uber and Lyft - which were believed to divert passengers away from subway use, and post-pandemic, I analyzed the growing shift to remote work, which significantly reduced ridership on New York City's subways. Although my team and I initially considered investigating the impact of fare evasion on the MTA's revenues, we decided against incorporating such an analysis into this report due to time constraints and the complexity that would arise from such a multifaceted topic. 
 
 ## TASK 2: Idenitfying Data Sources
 
-## TASK 3: Data Import and Data Cleaning
+In identifying data sources for this project, I initially considered using the fare data provided by the Federal Transit Administration (FTA), which had been used in Mini Project One. However, I decided against it for two key reasons: first, the data was split into seven separate yearly datasets, making it unwieldy, and second, it lacked the level of detail I needed, particularly regarding the relationship between ridership and fare revenue. Instead, I used a publicly available dataset from the MTA’s website, which provided monthly financial data from January 2019 onward. This dataset included both revenues and expenditures, broken down by type, allowing me to track monthly trends in revenue and gain a clearer picture of the MTA's overall financial health, including operating costs and capital expenditures.
 
-## TASK 4: Data Analysis and Data Visualization
+For the rideshare revenue analysis, I was unable to find direct data on rideshare revenues, so I constructed the dataset by extracting monthly ridership trip data from publicly available City of New York datasets. I then estimated revenue by multiplying the total number of trips by the average fare per ride, derived from pricing information provided by Uber and Lyft (the two largest riseshare companies in NYC), along with the typical trip distance in New York City.
 
-## TASK 5: Findings and Insights
+To evaluate the impact of remote work on MTA revenues, I encountered challenges in locating consistent data on remote work trends. As a result, I relied on a 2023 study conducted by the MTA, which provided key insights into how shifts in work patterns were affecting subway ridership and, by extension, fare revenue.
+
+## TASK 3: MTA Data Import, Cleaning, Visualization, and Analysis
+
+To begin my analysis, I loaded the necessary packages for my analysis. There are five packages in total I needed to load: 
+
+```{r}
+# Install and load the necessary packages
+library(readr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+```
+
+After loading my packages into the R environment, I can now begin my data import. The first data that I will import into my project is data from the NYCMTA website containing the agency's revenues and expenditures for every month since January 2019.
+
+```{r}
+# Link the URL to the CSV file
+url <- "https://data.ny.gov/api/views/yg77-3tkj/rows.csv?accessType=DOWNLOAD"
+
+# Read the CSV file into R as a dataframe from the URL
+mtafinancials2019to2024 <- read_csv(url)
+```
+
+Now that the data has been imported as a dataframe, it must be cleaned. The raw imported data contains information on both revenues and expenditures; however, I only need information on fare revenues. Furthermore, the raw data also contains different types of revenues; so I will need to filter it for specifically fare revenue in order to conduct my analysis. 
+
+```{r}
+# Filter the dataframe for revenue data, then sum the revenue based on month
+mtafarerevenue2019to2024 <- mtafinancials2019to2024 |>
+  filter(Type == "Total Revenue", `General Ledger` == "Farebox Revenue") |>
+  group_by(Month) |>
+  summarise(Fare_Revenue = sum(Amount, na.rm = TRUE))
+```
+
+Now that the data has been filtered by revenue type and grouped by month, I will create a plot to visualize the new dataframe. Here, I am interested in identifying if there are any trends one might be able to see in the data. 
+
+```{r}
+# Create a plot of the revenue
+ggplot(mtafarerevenue2019to2024, aes(x = Month, y = Fare_Revenue)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "blue", size = 1) +
+  labs(title = "MTA Monthly Fare Revenue",
+       x = "Month",
+       y = "Fare Revenue") +
+  theme_minimal() +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The first phase of my analysis is now complete, and several key trends are already emerging. First, the MTA's monthly fare revenue experienced a significant decline during the COVID-19 pandemic, reaching near-record lows. Second, despite nearly five years having passed since the onset of the pandemic and three years since its "official" end, the MTA's fare revenue has yet to fully recover to pre-pandemic levels. Lastly, I observed noticeable dips in fare revenue during late 2020 and late 2021, which align with the winter seasons and surges in COVID-19 variants and case numbers. 
+
+Keeping these findings in mind, I'll now move onto the next part of my analysis: examining the revenues of NYC's two largest rideshare companies by market share; Uber and Lyft.
+
+## TASK 4: Rideshare Data Import, Cleaning, Visualization, and Analysis
+
+
+
+## TASK 5: MTA and Rideshare Data in Context
 
 ## CONCLUSION
 
