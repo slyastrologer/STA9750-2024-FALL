@@ -25,7 +25,7 @@ To evaluate the impact of remote work on MTA revenues, I encountered challenges 
 
 ## TASK 3: MTA Data Import, Cleaning, Visualization, and Analysis
 
-To begin my analysis, I loaded the necessary packages for my analysis. There are five packages in total I needed to load: 
+To begin my analysis, I need to load the necessary packages to manipulate the data I will be importing. There are five packages in total I need to load: 
 
 ```{r}
 # Install and load the necessary packages
@@ -77,9 +77,140 @@ Keeping these findings in mind, I'll now move onto the next part of my analysis:
 
 ## TASK 4: Rideshare Data Import, Cleaning, Visualization, and Analysis
 
+To continue my analysis, I will need to import data on ridership for NYC's two largest rideshare companies by market share: Uber and Lyft. To do this, I will utilize datasets provided by the City of New York containing ridership figures for both companies. 
 
+```{r}
+# Link the URL to the CSV file for Uber Ridership Data
+url <- "https://data.cityofnewyork.us/resource/2v9c-2k7f.csv?$query=SELECT%20base_license_number%2C%20base_name%2C%20dba%2C%20year%2C%20month%2C%20month_name%2C%20total_dispatched_trips%2C%20total_dispatched_shared_trips%2C%20unique_dispatched_vehicles%20SEARCH%20%22uber%22"
+
+# Read the CSV file into R as a dataframe from the URL
+uber_ride_stats <- read_csv(url)
+
+# Link the URL to the CSV file for Lyft Ridership Data
+url <- "https://data.cityofnewyork.us/resource/2v9c-2k7f.csv?$query=SELECT%20base_license_number%2C%20base_name%2C%20dba%2C%20year%2C%20month%2C%20month_name%2C%20total_dispatched_trips%2C%20total_dispatched_shared_trips%2C%20unique_dispatched_vehicles%20SEARCH%20%22lyft%22"
+
+# Read the CSV file into R as a dataframe from the URL
+lyft_ride_stats <- read_csv(url)
+```
+
+After importing my data, I will clean it by filtering for records from 2017 onward and selecting only the columns relevant to my analysis. Additionally, I will need to convert my ridership statistics into a revenue estimate. To do this, I will first multiply the average price per mile for each rideshare company by the average distance traveled by a rideshare customer in NYC. Then, I will multiply this value by the number of trips taken in a given month to calculate the estimated revenue. 
+
+```{r}
+# Cleaning the Uber Data for Data from 2017 Onward
+uber_ride_stats2017to2024 <- uber_ride_stats |>
+  filter(year >= 2017) |>
+  select(base_name, year, month, total_dispatched_trips) |>
+  mutate(total_estimated_revenue = total_dispatched_trips * 14.48) |>
+  arrange(year, month)
+
+# Cleaning the Lyft Data for Data from 2017 Onward
+lyft_ride_stats2017to2024 <- lyft_ride_stats |>
+  filter(year >= 2017) |>
+  select(base_name, year, month, total_dispatched_trips) |>
+  mutate(total_estimated_revenue = total_dispatched_trips * 14.56) |>
+  arrange(year, month)
+```
+
+After cleaning my datasets, I will merge them into a single dataset and combine the "year" and "month" columns into a new column called "date."
+
+```{r}
+# Combine the Uber and Lyft data
+rideshare_stats2017to2024 <- bind_rows(uber_ride_stats2017to2024, lyft_ride_stats2017to2024)
+# Creating a date column combining the year and month columns
+rideshare_stats2017to2024$date <- make_date(rideshare_stats2017to2024$year, rideshare_stats2017to2024$month, 1)
+```
+
+My dataset is now ready for visualization. I believe a double line graph would be the most effective way to represent the scales and differences in the data, as well as to highlight any trends.
+
+```{r}
+# Create a plot of the total car trips for Uber and Lyft
+suppressWarnings(
+  ggplot(rideshare_stats2017to2024, aes(x = date, y = total_estimated_revenue, color = base_name, group = base_name)) +
+    geom_line(size = 1) +
+    geom_point(size = 1) +
+    labs(title = "Uber and Lyft Monthly Estimated Revenue",
+         x = "Month",
+         y = "Estimated Revenue",
+         color = "Company") +
+    theme_minimal() +
+    scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
+    scale_color_manual(values = c("UBER" = "black", "LYFT" = "pink")) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+```
+
+The second phase of my analysis is now complete, and several key insights have emerged. First, it is clear from the data that Uber holds the largest market share in the NYC rideshare market. Second, similar to the MTA, rideshare companies experienced a significant revenue decline during the pandemic, with a sharp drop in revenue at the onset of the crisis, followed by a steady recovery beginning in March 2021. Third, and perhaps most notably, Uber has yet to return to its pre-pandemic revenue levels, while Lyft has surpassed its pre-pandemic revenues. This suggests that, in the post-pandemic period, Lyft may be gaining market share at the expense of Uber. 
+
+Building on these findings, as well as my earlier analysis of the MTA's fare revenue, I will now examine both datasets in relation to one another, exploring their interdependencies or potential independence within the broader context of the analysis.
 
 ## TASK 5: MTA and Rideshare Data in Context
 
+The final step of my revenue analysis involves plotting the MTA fare revenue alongside Uber and Lyft rider revenue to assess potential dependencies between these factors. To do this, I will first re-clean the combined rideshare dataset to extract data starting from 2019, aligning it with the MTA dataset. Then, I will separate the rideshare data into independent datasets for Uber and Lyft.
+
+```{r}
+# Combine, clean, and plot the MTA, Uber, and Lyft Data
+# Step 1: Filter the data for 2019 onward
+mtafarerevenue2019to2024 <- mtafarerevenue2019to2024 %>%
+  filter(Month >= "2019-01-01")
+rideshare_stats2017to2024 <- rideshare_stats2017to2024 %>%
+  filter(date >= "2019-01-01")
+
+# Step 2: Separate the rideshare data into Uber and Lyft
+rideshare_uber <- rideshare_stats2017to2024 %>%
+  filter(base_name == "UBER")
+rideshare_lyft <- rideshare_stats2017to2024 %>%
+  filter(base_name == "LYFT")
+```
+
+After recleaning my rideshare revenue data, I will merge it with the MTA fare revenue data by date into a single comprehensive dataset. Additionally, I will distinguish each of the three variables — MTA revenue, Uber revenue, and Lyft revenue — to ensure that the data for each factor remains separate and does not overlap during the plotting process.
+
+```{r}
+# Step 3: Merge the datasets
+# Ensure the "Month" and "date" columns are of Date class for proper merging
+mtafarerevenue2019to2024$Month <- as.Date(mtafarerevenue2019to2024$Month)
+rideshare_uber$date <- as.Date(rideshare_uber$date)
+rideshare_lyft$date <- as.Date(rideshare_lyft$date)
+# Merge the MTA dataset with the Uber and Lyft datasets by month
+merged_data_uber <- left_join(mtafarerevenue2019to2024, rideshare_uber, by = c("Month" = "date"))
+merged_data_lyft <- left_join(mtafarerevenue2019to2024, rideshare_lyft, by = c("Month" = "date"))
+
+# Step 4: Combine the data for plotting
+combined_data <- bind_rows(
+  merged_data_uber %>% 
+    select(Month, Fare_Revenue, total_estimated_revenue) %>%
+    mutate(Rideshare = "UBER", Revenue = total_estimated_revenue),
+  
+  merged_data_lyft %>% 
+    select(Month, Fare_Revenue, total_estimated_revenue) %>%
+    mutate(Rideshare = "LYFT", Revenue = total_estimated_revenue)
+) %>%
+  mutate(Rideshare = factor(Rideshare, levels = c("UBER", "LYFT")))  # Ensure UBER and LYFT are factors for proper coloring
+```
+
+Finally, I will plot the merged dataset to visualize all three variables at once.
+
+```{r}
+# Step 5: Plot the data
+ggplot(combined_data, aes(x = Month)) +
+  geom_line(aes(y = Fare_Revenue, color = "MTA Fare Revenue"), size = 1) +
+  geom_line(aes(y = Revenue, color = Rideshare), size = 1) +
+  labs(
+    title = "Revenue Comparison: MTA vs Rideshare (UBER & LYFT)",
+    x = "Month",
+    y = "Revenue",
+    color = "Agency"
+  ) +
+  scale_color_manual(values = c("MTA Fare Revenue" = "blue", "UBER" = "black", "LYFT" = "pink")) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+The analysis of MTA, Uber, and Lyft revenues in context of each other reveals a strong correlation between the three, with their respective graphs closely mirroring each other, particularly in the post-pandemic period. This suggests that rather than being interdependent, MTA fare revenue and rideshare revenue are likely better understood as reflecting broader patterns in NYC movement and travel. The similar trends in their recoveries — marked by a sluggish rebound — indicate that Uber and Lyft ridership are not significantly impacting MTA revenues. Instead, both modes of transportation appear to be responding to the same external factors, such as changes in mobility preference and consumer behavior following the pandemic.
+
+## TASK 6: Remote Work in Context
+
+
+
 ## CONCLUSION
+
 

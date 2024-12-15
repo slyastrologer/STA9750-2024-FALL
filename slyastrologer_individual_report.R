@@ -132,7 +132,7 @@ ggplot(combined_data, aes(x = Month)) +
     title = "Revenue Comparison: MTA vs Rideshare (UBER & LYFT)",
     x = "Month",
     y = "Revenue",
-    color = "Legend"
+    color = "Agency"
   ) +
   scale_color_manual(values = c("MTA Fare Revenue" = "blue", "UBER" = "black", "LYFT" = "pink")) +
   theme_minimal() +
