@@ -4,7 +4,7 @@ library(dplyr)
 library(tidyr)
 library(lubridate)
 library(ggplot2)
-
+library(scales)
 
 
 
@@ -34,6 +34,7 @@ ggplot(mtafarerevenue2019to2024, aes(x = Month, y = Fare_Revenue)) +
        y = "Fare Revenue") +
   theme_minimal() +
   scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
+  scale_y_continuous(labels = comma) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
@@ -82,6 +83,7 @@ suppressWarnings(
          color = "Company") +
     theme_minimal() +
     scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
+    scale_y_continuous(labels = comma) +
     scale_color_manual(values = c("UBER" = "black", "LYFT" = "pink")) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 )
@@ -135,6 +137,7 @@ ggplot(combined_data, aes(x = Month)) +
     color = "Agency"
   ) +
   scale_color_manual(values = c("MTA Fare Revenue" = "blue", "UBER" = "black", "LYFT" = "pink")) +
+  scale_y_continuous(labels = comma) +
   theme_minimal() +
   theme(legend.position = "top")
 
