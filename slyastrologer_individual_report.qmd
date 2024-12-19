@@ -27,7 +27,7 @@ To evaluate the impact of remote work on MTA revenues, I encountered challenges 
 
 To begin my analysis, I need to load the necessary packages to manipulate the data I will be importing. There are five packages in total I need to load. 
 
-```{r}
+```{r, warning=FALSE}
 # Install and load the necessary packages
 library(readr)
 library(dplyr)
@@ -38,7 +38,7 @@ library(ggplot2)
 
 After loading my packages into the R environment, I can now begin my data import. The first data that I will import into my project is data from the NYCMTA website containing the agency's revenues and expenditures for every month since January 2019.
 
-```{r}
+```{r, warning=FALSE}
 # Link the URL to the CSV file
 url <- "https://data.ny.gov/api/views/yg77-3tkj/rows.csv?accessType=DOWNLOAD"
 
@@ -48,7 +48,11 @@ mtafinancials2019to2024 <- read_csv(url)
 
 Now that the data has been imported as a dataframe, it must be cleaned. The raw imported data contains information on both revenues and expenditures; however, I only need information on fare revenues. Furthermore, the raw data also contains different types of revenues; so I will need to filter it for specifically fare revenue in order to conduct my analysis. 
 
-```{r}
+```{r, warning=FALSE}
+# Filter the dataframe for transit data from the NYC Transit division and financial data that is confirmed
+mtafinancials2019to2024 <- mtafinancials2019to2024 |>
+  filter(Agency == "NYCT", Scenario == "Actual")
+
 # Filter the dataframe for revenue data, then sum the revenue based on month
 mtafarerevenue2019to2024 <- mtafinancials2019to2024 |>
   filter(Type == "Total Revenue", `General Ledger` == "Farebox Revenue") |>
@@ -58,7 +62,7 @@ mtafarerevenue2019to2024 <- mtafinancials2019to2024 |>
 
 Now that the data has been filtered by revenue type and grouped by month, I will create a plot to visualize the new dataframe. Here, I am interested in identifying if there are any trends one might be able to see in the data. 
 
-```{r}
+```{r, warning=FALSE}
 # Create a plot of the revenue
 ggplot(mtafarerevenue2019to2024, aes(x = Month, y = Fare_Revenue)) +
   geom_line(color = "blue", size = 1) +
@@ -79,7 +83,7 @@ Keeping these findings in mind, I'll now move onto the next part of my analysis:
 
 To continue my analysis, I will need to import data on ridership for NYC's two largest rideshare companies by market share: Uber and Lyft. To do this, I will utilize datasets provided by the City of New York containing ridership figures for both companies. 
 
-```{r}
+```{r, warning=FALSE}
 # Link the URL to the CSV file for Uber Ridership Data
 url <- "https://data.cityofnewyork.us/resource/2v9c-2k7f.csv?$query=SELECT%20base_license_number%2C%20base_name%2C%20dba%2C%20year%2C%20month%2C%20month_name%2C%20total_dispatched_trips%2C%20total_dispatched_shared_trips%2C%20unique_dispatched_vehicles%20SEARCH%20%22uber%22"
 
@@ -95,7 +99,7 @@ lyft_ride_stats <- read_csv(url)
 
 After importing my data, I will clean it by filtering for records from 2017 onward and selecting only the columns relevant to my analysis. Additionally, I will need to convert my ridership statistics into a revenue estimate. To do this, I will first multiply the average price per mile for each rideshare company by the average distance traveled by a rideshare customer in NYC. Then, I will multiply this value by the number of trips taken in a given month to calculate the estimated revenue. 
 
-```{r}
+```{r, warning=FALSE}
 # Cleaning the Uber Data for Data from 2017 Onward
 uber_ride_stats2017to2024 <- uber_ride_stats |>
   filter(year >= 2017) |>
@@ -113,7 +117,7 @@ lyft_ride_stats2017to2024 <- lyft_ride_stats |>
 
 After cleaning my datasets, I will merge them into a single dataset and combine the "year" and "month" columns into a new column called "date."
 
-```{r}
+```{r, warning=FALSE}
 # Combine the Uber and Lyft data
 rideshare_stats2017to2024 <- bind_rows(uber_ride_stats2017to2024, lyft_ride_stats2017to2024)
 # Creating a date column combining the year and month columns
@@ -122,7 +126,7 @@ rideshare_stats2017to2024$date <- make_date(rideshare_stats2017to2024$year, ride
 
 My dataset is now ready for visualization. I believe a double line graph would be the most effective way to represent the scales and differences in the data, as well as to highlight any trends.
 
-```{r}
+```{r, warning=FALSE}
 # Create a plot of the total car trips for Uber and Lyft
 suppressWarnings(
   ggplot(rideshare_stats2017to2024, aes(x = date, y = total_estimated_revenue, color = base_name, group = base_name)) +
@@ -147,7 +151,7 @@ Building on these findings, as well as my earlier analysis of the MTA's fare rev
 
 The final step of my revenue analysis involves plotting the MTA fare revenue alongside Uber and Lyft rider revenue to assess potential dependencies between these factors. To do this, I will first re-clean the combined rideshare dataset to extract data starting from 2019, aligning it with the MTA dataset. Then, I will separate the rideshare data into independent datasets for Uber and Lyft.
 
-```{r}
+```{r, warning=FALSE}
 # Combine, clean, and plot the MTA, Uber, and Lyft Data
 # Step 1: Filter the data for 2019 onward
 mtafarerevenue2019to2024 <- mtafarerevenue2019to2024 %>%
@@ -164,7 +168,7 @@ rideshare_lyft <- rideshare_stats2017to2024 %>%
 
 After recleaning my rideshare revenue data, I will merge it with the MTA fare revenue data by date into a single comprehensive dataset. Additionally, I will distinguish each of the three variables — MTA revenue, Uber revenue, and Lyft revenue — to ensure that the data for each factor remains separate and does not overlap during the plotting process.
 
-```{r}
+```{r, warning=FALSE}
 # Step 3: Merge the datasets
 # Ensure the "Month" and "date" columns are of Date class for proper merging
 mtafarerevenue2019to2024$Month <- as.Date(mtafarerevenue2019to2024$Month)
@@ -189,7 +193,7 @@ combined_data <- bind_rows(
 
 Finally, I will plot the merged dataset to visualize all three variables at once.
 
-```{r}
+```{r, warning=FALSE}
 # Step 5: Plot the data
 ggplot(combined_data, aes(x = Month)) +
   geom_line(aes(y = Fare_Revenue, color = "MTA Fare Revenue"), size = 1) +
